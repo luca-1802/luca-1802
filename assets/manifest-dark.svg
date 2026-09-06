@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600" role="img" aria-labelledby="title description">
 <title id="title">Luca — Public software manifest</title>
-<desc id="description">Luca, luca-1802, Germany. Software and automation. 5 public repositories, 2 stars on original repositories, 6 followers, 7 source languages. Public snapshot sampled 2026-09-06T15:17:54Z. Selected projects: password-manager, file-organizer, weather-cli. Language shares use bytes from original repositories, excluding the profile repository. Public commit references are a bounded default-branch sample, not total contributions. Full details and links are in the accompanying profile.txt. The decorative barcode is the only animation and respects reduced motion.</desc>
+<desc id="description">Luca, luca-1802, Germany. Software and automation. 5 public repositories, 2 stars on original repositories, 6 followers, 7 source languages. Public snapshot sampled 2026-09-06T15:33:03Z. Selected projects: password-manager, file-organizer, weather-cli. Language shares use bytes from original repositories, excluding the profile repository. Public commit references are a bounded default-branch sample, not total contributions. Full details and links are in the accompanying profile.txt. The decorative barcode is the only animation and respects reduced motion.</desc>
 <defs>
   <pattern id="registration-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#8aaaff" stroke-width="0.6" opacity="0.08"/></pattern>
   <clipPath id="barcode-clip"><rect x="658" y="131" width="166" height="62"/></clipPath>
@@ -143,11 +143,11 @@
 <text x="34" y="1208" class="mono meta blue" transform="rotate(-90 34 1208)">05</text>
 <text x="94" y="1208" class="mono meta blue" font-weight="700">CHANGELOG EXCERPT</text>
 <text x="824" y="1208" class="mono meta muted" text-anchor="end">PUBLIC COMMIT REFERENCES</text>
-<text x="94" y="1250" class="mono blue" font-size="18" >22b7850</text>
+<text x="94" y="1250" class="mono blue" font-size="18" >fb3acc2</text>
 <text x="259" y="1250" class="mono ink" font-size="18" >luca-1802</text>
-<text x="94" y="1292" class="mono blue" font-size="18" >0126a4b</text>
+<text x="94" y="1292" class="mono blue" font-size="18" >22b7850</text>
 <text x="259" y="1292" class="mono ink" font-size="18" >luca-1802</text>
-<text x="94" y="1334" class="mono blue" font-size="18" >c440865</text>
+<text x="94" y="1334" class="mono blue" font-size="18" >0126a4b</text>
 <text x="259" y="1334" class="mono ink" font-size="18" >luca-1802</text>
 <path d="M235 1233V1339" class="rule"/>
 <path d="M806 1244H824" stroke="#35404e" stroke-width="1"/>
