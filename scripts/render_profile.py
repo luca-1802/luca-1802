@@ -1,43 +1,134 @@
-"""Render the profile's original SVG console panels from a public GitHub snapshot."""
+"""Render the Manifest profile from a public GitHub snapshot, without network access."""
 from __future__ import annotations
 
 import argparse
+from datetime import datetime
 from html import escape
 import json
+import math
 from pathlib import Path
+import re
+from urllib.parse import quote
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-BG, SURFACE, BORDER = '#080c12', '#0e1621', '#253448'
-WHITE, BLUE, MUTED = '#ecf3ff', '#75baff', '#8b9fb8'
-PALETTE = [BLUE, '#a6d3ff', '#d8eaff', '#4e8ed8', '#a4c8eb', '#789dc4']
-FONT = "'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace"
-CSS = '''
-text{font-family:FONT}
-.pulse{animation:pulse 2.8s ease-in-out infinite}
-.cursor{animation:blink 1.2s step-end infinite}
-.orbit{transform-origin:80px 80px;animation:orbit 32s linear infinite}
-.scan{animation:scan 9s linear infinite}
-.boot{animation:boot 16s linear infinite;animation-delay:var(--delay,0s)}
-.meter{transform-box:fill-box;transform-origin:left;animation:meter 1.2s ease-out both}
-.rowlight{animation:rowlight 10s ease-in-out infinite;animation-delay:var(--delay,0s)}
-.tick{opacity:0;animation:tick 15s linear infinite;animation-delay:var(--delay,0s)}
-.tick.first{opacity:1}
-.hexlight{animation:hexlight 12s steps(7,end) infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-@keyframes orbit{to{transform:rotate(360deg)}}
-@keyframes scan{from{transform:translateY(-40px)}to{transform:translateY(440px)}}
-@keyframes boot{0%,3%{opacity:.16}8%,85%{opacity:1}92%,100%{opacity:.16}}
-@keyframes meter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-@keyframes rowlight{0%,8%,100%{opacity:0}15%,28%{opacity:.12}35%,95%{opacity:0}}
-@keyframes tick{0%,29%{opacity:1}33%,100%{opacity:0}}
-@keyframes hexlight{from{transform:translateY(0)}to{transform:translateY(196px)}}
-@media(prefers-reduced-motion:reduce){
- .pulse,.cursor,.orbit,.scan,.boot,.meter,.rowlight,.tick,.hexlight{animation:none!important}
- .scan,.rowlight,.hexlight{display:none}.tick{opacity:0}.tick.first{opacity:1}
+LOGIN = 'luca-1802'
+THEMES = {
+    'light': dict(background='#f1f5fb', paper='#fdfefe', rule='#d8e0ec',
+                  ink='#222b3a', muted='#637084', blue='#164ee6',
+                  strong='#222b3a', secondary='#65738b', other='#dbe3ef'),
+    'dark': dict(background='#0d1117', paper='#161b22', rule='#35404e',
+                 ink='#e6edf3', muted='#a2adbd', blue='#8aaaff',
+                 strong='#758398', secondary='#8290a5', other='#d0d9e6'),
 }
-'''.replace('FONT', FONT)
+PROJECTS = {
+    'password-manager': ('APPLICATION', 'Self-hosted vault', ['TypeScript · React', 'Python']),
+    'file-organizer': ('UTILITY', 'File classification', ['Python']),
+    'weather-cli': ('COMMAND-LINE TOOL', 'OpenWeather client', ['Python · OpenWeather']),
+}
+BARCODE = [(0, 3), (7, 1), (12, 5), (21, 2), (27, 1), (32, 4), (40, 2),
+           (46, 6), (56, 1), (61, 3), (68, 2), (74, 5), (83, 1), (88, 2),
+           (94, 4), (102, 1), (107, 6), (117, 2), (123, 1), (128, 4),
+           (136, 2), (142, 5), (151, 1), (156, 3), (163, 3)]
+
+
+def text_value(value, field, *, nullable=False):
+    if nullable and value is None:
+        return
+    if not isinstance(value, str) or any(
+        ord(c) < 32 and c not in '\t\n\r' or 0xD800 <= ord(c) <= 0xDFFF
+        or ord(c) in (0xFFFE, 0xFFFF) for c in value
+    ):
+        raise ValueError(f'{field} must be XML-safe text')
+
+
+def natural(value, field):
+    if type(value) is not int or value < 0:
+        raise ValueError(f'{field} must be a nonnegative integer')
+
+
+def timestamp(value, field, *, date_only=False):
+    text_value(value, field)
+    pattern = '%Y-%m-%d' if date_only else '%Y-%m-%dT%H:%M:%SZ'
+    try:
+        if datetime.strptime(value, pattern).strftime(pattern) != value:
+            raise ValueError
+    except ValueError:
+        raise ValueError(f'{field} must be a valid {"date" if date_only else "UTC timestamp"}') from None
+
+
+def validate_snapshot(data):
+    """Fail before writing assets if a snapshot cannot support accurate output."""
+    if not isinstance(data, dict) or type(data.get('schema_version')) is not int or data['schema_version'] != 1 or data.get('login') != LOGIN:
+        raise ValueError('Unexpected profile snapshot identity or schema')
+    timestamp(data.get('sampled_at'), 'sampled_at')
+    profile = data.get('profile')
+    if not isinstance(profile, dict):
+        raise ValueError('profile must be an object')
+    text_value(profile.get('name'), 'profile.name')
+    for key in ('followers', 'following', 'public_repos'):
+        natural(profile.get(key), 'profile.' + key)
+    timestamp(profile.get('created_at'), 'profile.created_at')
+    for key in ('repos', 'languages', 'commits', 'events', 'activity'):
+        if not isinstance(data.get(key), list) or any(not isinstance(row, dict) for row in data[key]):
+            raise ValueError(f'{key} must be an array of objects')
+    repo_names = set()
+    for row in data['repos']:
+        name = row.get('name')
+        text_value(name, 'repository name')
+        if not name or name.casefold() in repo_names:
+            raise ValueError('Repository names must be nonempty and unique')
+        repo_names.add(name.casefold())
+        for key in ('stars', 'forks'):
+            natural(row.get(key), 'repository ' + key)
+        if type(row.get('is_fork')) is not bool:
+            raise ValueError('repository is_fork must be a boolean')
+        text_value(row.get('language'), 'repository language', nullable=True)
+        text_value(row.get('description'), 'repository description')
+        if row.get('url') != f'https://github.com/{LOGIN}/{quote(name, safe="-._~")}':
+            raise ValueError('Repository URL must identify its public GitHub repository')
+        if row.get('pushed_at') is not None:
+            timestamp(row['pushed_at'], 'repository pushed_at')
+    language_names = set()
+    for row in data['languages']:
+        name = row.get('name')
+        text_value(name, 'language name')
+        if not name or name.casefold() in language_names:
+            raise ValueError('Language names must be nonempty and unique')
+        language_names.add(name.casefold())
+        natural(row.get('bytes'), 'language bytes')
+        pct = row.get('percentage')
+        if type(pct) not in (int, float) or not math.isfinite(pct) or not 0 <= pct <= 100:
+            raise ValueError('Invalid language percentage')
+    for key in ('commits', 'events'):
+        for row in data[key]:
+            name = row.get('repo')
+            text_value(name, key + ' repository')
+            if name.casefold() not in repo_names:
+                raise ValueError(f'{key} must refer to a public repository in the snapshot')
+            timestamp(row.get('created_at'), key + ' created_at')
+            url = row.get('url')
+            base = f'https://github.com/{LOGIN}/{quote(name, safe="-._~")}'
+            if key == 'commits':
+                sha = row.get('sha')
+                if not isinstance(sha, str) or not re.fullmatch(r'[0-9a-fA-F]{40}|[0-9a-fA-F]{64}', sha):
+                    raise ValueError('Invalid public commit SHA')
+                if url != f'{base}/commit/{sha}':
+                    raise ValueError('Commit URL does not match its public reference')
+                # Commit messages are intentionally not consumed or rendered.
+            else:
+                text_value(row.get('kind'), 'event kind')
+                text_value(row.get('message'), 'event message')
+                if not isinstance(url, str) or not (url == base or re.fullmatch(re.escape(base) + r'/(?:commit/(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})|(?:issues|pull)/[0-9]+)', url)):
+                    raise ValueError('Event URL must identify a public GitHub reference')
+    dates = set()
+    for row in data['activity']:
+        timestamp(row.get('date'), 'activity date', date_only=True)
+        natural(row.get('count'), 'activity count')
+        if row['date'] in dates:
+            raise ValueError('Activity dates must be unique')
+        dates.add(row['date'])
+    return data
 
 
 def e(value):
@@ -45,254 +136,324 @@ def e(value):
 
 
 def short(value, limit):
-    value = str(value or '').replace('\n', ' ').replace('\r', ' ')
-    return value if len(value) <= limit else value[:limit-1] + '…'
+    value = ' '.join(str(value or '').split())
+    return value if len(value) <= limit else value[:limit - 1] + '…'
 
 
-def txt(x, y, value, size=14, color=WHITE, extra=''):
-    return f'<text x="{x}" y="{y}" font-size="{size}" fill="{color}" {extra}>{e(value)}</text>'
+def txt(x, y, value, classes='mono ink', size=None, extra=''):
+    font = f' font-size="{size}"' if size is not None else ''
+    return f'<text x="{x}" y="{y}" class="{classes}"{font} {extra}>{e(value)}</text>\n'
 
 
-def rect(x, y, w, h, fill=SURFACE, extra=''):
-    return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}" {extra}/>'
+def rule(x, y, right, theme, strong=False):
+    return f'<path d="M{x} {y}H{right}" stroke="{theme["strong" if strong else "rule"]}" stroke-width="{1.5 if strong else 1}"/>\n'
 
 
-def line(x1, y1, x2, y2, color=BORDER, extra=''):
-    return f'<path d="M{x1} {y1}H{x2}" stroke="{color}" {extra}/>' if y1 == y2 else f'<path d="M{x1} {y1}L{x2} {y2}" stroke="{color}" {extra}/>'
+def selected_projects(data):
+    candidates = {r['name'].casefold(): r for r in data['repos']
+                  if not r['is_fork'] and r['name'].casefold() != data['login'].casefold()}
+    selected = [candidates[name] for name in PROJECTS if name in candidates]
+    remaining = [r for name, r in candidates.items() if name not in PROJECTS]
+    selected += sorted(remaining, key=lambda r: (-r['stars'], r['name'].casefold()))[:3 - len(selected)]
+    return selected
 
 
-def wrap(body, width, height, title, desc, panel=True):
-    start = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
-<title id="title">{e(title)}</title><desc id="desc">{e(desc)}</desc>
-<defs><style>{CSS}</style>
-<pattern id="noise" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".45" fill="{BLUE}" opacity=".065"/></pattern>
-<pattern id="lines" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3H4" stroke="#000" opacity=".15"/></pattern>
-<linearGradient id="scan"><stop stop-color="{BLUE}" stop-opacity="0"/><stop offset=".5" stop-color="{BLUE}" stop-opacity=".09"/><stop offset="1" stop-color="{BLUE}" stop-opacity="0"/></linearGradient>
-<clipPath id="bounds"><rect width="{width}" height="{height}"/></clipPath></defs>
-<g clip-path="url(#bounds)">{rect(0,0,width,height,BG)}{rect(0,0,width,height,'url(#noise)')}'''
-    end = rect(0,0,width,height,'url(#lines)', 'pointer-events="none"')
-    if panel:
-        end += rect(.5,.5,width-1,height-1,'none',f'stroke="{BORDER}"')
-    return start + body + end + '</g></svg>\n'
+def apportion(weights, units):
+    """Largest remainders keep displayed totals exact, including tied shares."""
+    total = sum(weights)
+    if not total:
+        return [0] * len(weights)
+    values = [weight * units // total for weight in weights]
+    order = sorted(range(len(weights)), key=lambda i: (-(weights[i] * units % total), i))
+    for i in order[:units - sum(values)]:
+        values[i] += 1
+    return values
 
 
-def head(width, path, right='', mobile=False):
-    size = 16 if mobile else 13
-    out = rect(0,0,width,36,SURFACE) + line(0,36,width,36)
-    out += txt(16,24,path,size,BLUE)
-    if right:
-        out += txt(width-16,24,right,13 if mobile else 11,MUTED,'text-anchor="end"')
+def language_groups(data):
+    rows = sorted(data['languages'], key=lambda r: (-r['bytes'], r['name'].casefold()))
+    if not sum(row['bytes'] for row in rows):
+        return []
+    groups = [(row['name'], row['bytes']) for row in rows[:2]]
+    groups.append(('Other', sum(row['bytes'] for row in rows[2:])))
+    tenths = apportion([size for _, size in groups], 1000)
+    return [(name, size, pct / 10) for (name, size), pct in zip(groups, tenths)]
+
+
+def recent_commits(data):
+    return sorted(data['commits'], key=lambda r: (r['created_at'], r['repo'].casefold(), r['sha']), reverse=True)[:3]
+
+
+def start_sheet(data, theme, mobile):
+    width, height = (480, 2260) if mobile else (900, 1600)
+    edge, margin, hole_x = (10, 40, 24) if mobile else (18, 62, 39)
+    bx, by = (276, 152) if mobile else (658, 131)
+    stars = sum(r['stars'] for r in data['repos'] if not r['is_fork'])
+    desc = (f"Luca, {data['login']}, Germany. Software and automation. "
+            f"{len(data['repos'])} public repositories, {stars} stars on original repositories, "
+            f"{data['profile']['followers']} followers, {len(data['languages'])} source languages. "
+            f"Public snapshot sampled {data['sampled_at']}. Selected projects: "
+            + (', '.join(r['name'] for r in selected_projects(data)) or 'none') + '. '
+            'Language shares use bytes from original repositories, excluding the profile repository. '
+            'Public commit references are a bounded default-branch sample, not total contributions. '
+            'Full details and links are in the accompanying profile.txt. '
+            'The decorative barcode is the only animation and respects reduced motion.')
+    out = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title description">
+<title id="title">Luca — Public software manifest</title>
+<desc id="description">{e(desc)}</desc>
+<defs>
+  <pattern id="registration-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="{theme['blue']}" stroke-width="0.6" opacity="0.08"/></pattern>
+  <clipPath id="barcode-clip"><rect x="{bx}" y="{by}" width="166" height="62"/></clipPath>
+  <style>
+    .mono {{ font-family: 'Cascadia Mono', 'Consolas', 'Liberation Mono', monospace; }}
+    .sans {{ font-family: 'Bahnschrift', 'DIN Alternate', 'Segoe UI', sans-serif; }}
+    .ink {{ fill: {theme['ink']}; }}
+    .muted {{ fill: {theme['muted']}; }}
+    .blue {{ fill: {theme['blue']}; }}
+    .meta {{ font-size: 14px; letter-spacing: 0.5px; }}
+    .label {{ font-size: {18 if mobile else 16}px; }}
+    .rule {{ stroke: {theme['rule']}; stroke-width: 1; }}
+    .scan {{ animation: scan 7s ease-in-out infinite; }}
+    @keyframes scan {{
+      0%, 16% {{ transform: translateX(0); opacity: 0.25; }}
+      55% {{ transform: translateX(146px); opacity: 0.65; }}
+      80%, 100% {{ transform: translateX(0); opacity: 0.25; }}
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+      .scan {{ animation: none; transform: none; opacity: 0.35; }}
+    }}
+  </style>
+</defs>
+<rect width="{width}" height="{height}" fill="{theme['background']}"/>
+<path d="M{edge} {edge}H{width-edge}V{height-edge}H{edge}Z" fill="{theme['paper']}" stroke="{theme['rule']}"/>
+<path d="M{margin} {edge}V{height-edge}" class="rule" stroke-dasharray="2 5"/>
+<rect x="{edge}" y="{edge}" width="{6 if mobile else 8}" height="86" fill="{theme['blue']}"/>
+<g fill="{theme['background']}" stroke="{theme['rule']}" stroke-width="1" aria-hidden="true">
+'''
+    for y in range(139, height - 40, 228):
+        out += f'<circle cx="{hole_x}" cy="{y}" r="{4 if mobile else 6}"/>\n'
+    return out + '</g>\n'
+
+
+def barcode(theme, mobile):
+    x, y = (276, 152) if mobile else (658, 131)
+    out = f'<g aria-hidden="true"><rect x="{x-8}" y="{y-9}" width="182" height="80" fill="url(#registration-grid)"/>\n'
+    for offset, width in BARCODE:
+        out += f'<rect x="{x+offset}" y="{y}" width="{width}" height="62" fill="{theme["ink"]}"/>\n'
+    out += f'<g clip-path="url(#barcode-clip)"><rect class="scan" x="{x+2}" y="{y}" width="18" height="62" fill="{theme["blue"]}" opacity="0.35"/></g></g>\n'
     return out
 
 
-def foot(width, height, left, right='', mobile=False):
-    y=height-29
-    out = line(0,y,width,y) + txt(16,y+19,left,12 if mobile else 11,MUTED)
+def section(number, title, y, mobile, right=''):
+    x, rx, mx = (62, 442, 27) if mobile else (94, 824, 34)
+    out = txt(mx, y, f'{number:02}', 'mono meta blue', extra=f'transform="rotate(-90 {mx} {y})"')
+    out += txt(x, y, title, 'mono meta blue', extra='font-weight="700"')
     if right:
-        out += txt(width-16,y+19,right,11,MUTED,'text-anchor="end"')
+        out += txt(rx, y, right, 'mono meta muted', extra='text-anchor="end"')
     return out
 
 
-def mark():
-    body = '<g class="orbit"><circle cx="80" cy="80" r="66" fill="none" stroke="#253448" stroke-dasharray="2 7"/><path d="M80 14A66 66 0 0 1 146 80" fill="none" stroke="#75baff"/><rect x="143" y="77" width="6" height="6" fill="#ecf3ff"/></g>'
-    body += rect(39,39,82,82,BG,f'stroke="{BLUE}"')
-    for pos in range(49,117,11):
-        body += line(pos,31,pos,38,MUTED)+line(pos,122,pos,129,MUTED)+line(31,pos,38,pos,MUTED)+line(122,pos,129,pos,MUTED)
-    body += txt(53,87,'lc',36,WHITE,'font-weight="700"') + txt(80,109,'1802',9,BLUE,'text-anchor="middle" letter-spacing="3"')
-    body += '<circle class="pulse" cx="110" cy="49" r="2.5" fill="#75baff"/>'
-    return wrap(body,160,160,'Luca microchip monogram','An lc monogram inside a blue microchip with a slowly orbiting signal.',False)
-
-
-def hero(data, mobile=False):
-    w,h=(480,352) if mobile else (960,276)
-    body = txt(28,29,'USER SPACE / PERSONAL SYSTEM',12,BLUE,'letter-spacing="1.5"')
-    for n,col in enumerate([WHITE,'#d8eaff','#a6d3ff',BLUE,'#4e8ed8','#253448']):
-        body += rect(28,55+n*9,8,7,col)
-    body += txt(54,101,'luca-1802',48 if mobile else 61,WHITE,'font-weight="700" letter-spacing="-2"')
-    body += line(54,116,443 if mobile else 555,116,BLUE)
-    rows=[('FOCUS','software / automation'),('STACK','Python · TypeScript · React'),('BASE','Germany'),('TOOLS','Docker · Git · CLI')]
-    for n,(label,value) in enumerate(rows):
-        y=153+n*(30 if mobile else 23)
-        body += txt(28 if mobile else 54,y,label,14 if mobile else 12,MUTED)
-        body += txt(110 if mobile else 147,y,value,16 if mobile else 14)
-    cy=303 if mobile else 248
-    body += txt(28 if mobile else 54,cy,'> ./luca --init',17 if mobile else 15,BLUE)
-    body += rect(183 if mobile else 192,cy-14,8,17,WHITE,'class="cursor"')
+def identity(data, theme, mobile):
+    x, rx = (62, 442) if mobile else (94, 824)
+    out = txt(x, 48 if mobile else 62, 'MANIFEST', 'mono meta blue', extra='font-weight="700"')
+    out += txt(rx, 76 if mobile else 62, 'SNAPSHOT · ' + data['sampled_at'][:10], 'mono meta muted', extra='text-anchor="end"')
+    out += rule(x, 98 if mobile else 84, rx, theme, True)
+    out += txt(x, 130 if mobile else 124, 'PUBLIC SOFTWARE MANIFEST', 'mono meta muted')
+    out += txt(x - 4, 205 if mobile else 195, 'Luca', 'sans ink', 64 if mobile else 68, 'font-weight="650" letter-spacing="-2"')
+    out += txt(x, 245 if mobile else 229, '@' + data['login'], 'mono blue', 20 if mobile else 22)
+    out += barcode(theme, mobile)
+    out += txt(rx, 244 if mobile else 223, 'ID / LUCA-1802', 'mono muted' if mobile else 'mono meta muted', 12 if mobile else None, 'text-anchor="end"')
     if mobile:
-        body += txt(452,333,'PUBLIC PROFILE',11,MUTED,'text-anchor="end" letter-spacing="1"')
+        out += txt(x, 294, 'Software &', 'sans ink', 29) + txt(x, 327, 'automation', 'sans ink', 29)
+        out += txt(x, 362, 'DE / Germany', 'mono label ink')
     else:
-        body += rect(641,54,291,190,'none',f'stroke="{BORDER}"')+rect(641,54,291,27,SURFACE)
-        body += txt(654,72,'session.info',12,BLUE)+txt(918,72,'0x1802',11,MUTED,'text-anchor="end"')
-        status=[('user',data['login']),('repos',str(len(data['repos'])).zfill(2)+' public'),('branch','main'),('created',data['profile']['created_at'][:4]),('mode','read / build / repeat'),('refresh','daily')]
-        for n,(k,v) in enumerate(status):
-            body += txt(654,102+n*23,k,12,MUTED)+txt(726,102+n*23,v,12)
-    body += rect(0,0,w,32,'url(#scan)','class="scan" pointer-events="none"')
-    return wrap(body,w,h,'luca-1802 / user space','Luca in Germany. Software and automation. Python, TypeScript, React, Docker, Git and CLI tools. Animated profile terminal.')
+        out += txt(x, 279, 'Software & automation', 'sans ink', 29)
+        out += txt(rx, 279, 'DE / Germany', 'mono label ink', extra='text-anchor="end"')
+    return out + rule(x, 390 if mobile else 310, rx, theme, True)
 
 
-def stats(data, mobile=False):
-    w,h=(480,295) if mobile else (960,180)
-    own=[r for r in data['repos'] if not r['is_fork']]
-    values=[('STARS',sum(r['stars'] for r in own),'original repositories'),('REPOSITORIES',len(data['repos']),'public repositories'),('FOLLOWERS',data['profile']['followers'],'on GitHub'),('LANGUAGES',len(data['languages']),'original source code')]
-    body=head(w,'/sys/github/stats','PUBLIC SNAPSHOT' if not mobile else '',mobile)
-    for n,(label,value,sub) in enumerate(values):
-        x=14+(n%2)*232 if mobile else 14+n*236
-        y=48+(n//2)*103 if mobile else 48
-        cw=218 if mobile else 220
-        body += rect(x,y,cw,92,SURFACE)+rect(x,y,2,92,BLUE)
-        body += txt(x+14,y+20,label,12 if mobile else 10,MUTED,'letter-spacing="1.3"')
-        body += txt(x+14,y+61,str(value).zfill(2),38,WHITE)
-        body += txt(x+cw-12,y+81,sub,10,MUTED,'text-anchor="end"')
-        body += f'<circle class="pulse" cx="{x+cw-12}" cy="{y+15}" r="2" fill="{BLUE}"/>'
-    body += foot(w,h,'updated '+data['sampled_at'][:10],'' if mobile else 'luca-1802@github',mobile)
-    return wrap(body,w,h,'GitHub statistics',f"{values[0][1]} stars on original repositories, {values[1][1]} public repositories, {values[2][1]} followers, {values[3][1]} source languages. Sampled {data['sampled_at']}.")
+def counts(data, theme, mobile):
+    values = [len(data['repos']), sum(r['stars'] for r in data['repos'] if not r['is_fork']),
+              data['profile']['followers'], len(data['languages'])]
+    labels = ['Public repos', 'Stars', 'Followers', 'Languages']
+    out = section(1, 'PROFILE COUNTS', 428 if mobile else 348, mobile, '' if mobile else 'SNAPSHOT VALUES')
+    for n, (value, label) in enumerate(zip(values, labels)):
+        x = 62 + n % 2 * 202 if mobile else 94 + n * 188
+        y = 488 + n // 2 * 96 if mobile else 413
+        rendered = str(value).zfill(2)
+        size = min(48, (165 if mobile else 155) / max(len(rendered), 1) / .62)
+        out += txt(x, y, rendered, 'mono ink', round(size, 2), 'font-weight="600" letter-spacing="-2"')
+        out += txt(x, y + (32 if mobile else 30), label, 'mono label muted')
+    out += '<path d="M252 461V621M62 546H442" class="rule"/>\n' if mobile else '<path d="M257 378V448M445 378V448M633 378V448" class="rule"/>\n'
+    return out + rule(62 if mobile else 94, 648 if mobile else 475, 442 if mobile else 824, theme)
 
 
-def ticker(mobile=False):
-    w,h=(480,136) if mobile else (960,92)
-    body=head(w,'/proc/focus','ROTATING / 15s' if not mobile else '',mobile)
-    rows=[('SELF-HOSTED','password-manager'),('AUTOMATION','file-organizer'),('COMMAND LINE','weather-cli')]
-    for n,(tag,value) in enumerate(rows):
-        delay=-15+n*5
-        body += f'<g class="tick {"first" if n==0 else ""}" style="--delay:{delay}s">'
-        body += txt(20,67 if mobile else 70,tag,13,BLUE,'letter-spacing="1"')
-        body += txt(20 if mobile else 217,108 if mobile else 70,value,24 if mobile else 21)
-        body += '</g>'
-    body += rect(w-27,h-25,7,12,BLUE,'class="cursor"')
-    return wrap(body,w,h,'Current focus','Rotating project focus: self-hosted password-manager, file-organizer automation, and weather-cli.')
+def inventory(data, theme, mobile):
+    rows = selected_projects(data)
+    selected = f'{len(rows):02} SELECTED / {len(data["repos"]):02} PUBLIC'
+    out = section(2, 'PACKAGE INVENTORY', 688 if mobile else 515, mobile, '' if mobile else selected)
+    if mobile:
+        out += txt(62, 718, selected, 'mono meta muted')
+    else:
+        out += txt(94, 556, 'PACKAGE', 'mono meta muted') + txt(385, 556, 'PURPOSE / RUNTIME', 'mono meta muted')
+        out += txt(824, 556, 'NO.', 'mono meta muted', extra='text-anchor="end"')
+    out += rule(62 if mobile else 94, 740 if mobile else 572, 442 if mobile else 824, theme, True)
+    for n, row in enumerate(rows):
+        tag, purpose, runtime = PROJECTS.get(row['name'].casefold(), ('PUBLIC PROJECT', row['description'] or 'Original public repository', [row['language'] or 'Language unavailable']))
+        y = 778 + n * 174 if mobile else [611, 724, 821][n]
+        out += txt(62 if mobile else 94, y, short(row['name'], 27 if mobile else 22), 'mono ink', 22 if mobile else 20, 'font-weight="600"')
+        out += txt(62 if mobile else 94, y + (28 if mobile else 27), tag, 'mono meta muted')
+        out += txt(62 if mobile else 385, y + (64 if mobile else 0), short(purpose, 34), 'mono label ink')
+        for j, value in enumerate(runtime[:2]):
+            out += txt(62 if mobile else 385, y + (94 + j * 26 if mobile else 27 + j * 24), short(value, 34 if mobile else 40), 'mono label muted')
+        out += txt(442 if mobile else 824, y + (28 if mobile else 0), f'{n+1:02}', 'mono label blue', extra='text-anchor="end"')
+        if n < 2:
+            out += rule(62 if mobile else 94, 916 + n * 174 if mobile else [684, 781][n], 442 if mobile else 824, theme)
+    if not rows:
+        out += txt(62 if mobile else 94, 790 if mobile else 624, 'No public projects available.', 'mono label muted')
+    return out + rule(62 if mobile else 94, 1264 if mobile else 878, 442 if mobile else 824, theme, True)
 
 
-def boot(mobile=False):
-    w,h=(480,316) if mobile else (960,263)
-    body=head(w,'profile.init()','BOOT SEQUENCE' if not mobile else '',mobile)
-    rows=[('00.018','mount','/home/luca'),('00.042','load','Python · TypeScript'),('00.106','attach','React · Docker · Git'),('00.184','index','public repositories'),('00.256','start','interactive session'),('00.512','ready','luca-1802@github')]
-    for n,(tm,cmd,value) in enumerate(rows):
-        y=70+n*(32 if mobile else 27)
-        body += f'<g class="boot" style="--delay:{n*.6}s">'
-        body += txt(17,y,tm,14 if mobile else 12,MUTED)
-        body += txt(89 if mobile else 100,y,cmd.ljust(7),15 if mobile else 14,BLUE)
-        body += txt(171 if mobile else 220,y,value,15 if mobile else 14)
-        if not mobile:
-            body += txt(931,y,'[ OK ]',12,MUTED,'text-anchor="end"')
-        body += '</g>'
-    body += foot(w,h,'profile boot animation','LOOP / 16s' if not mobile else '',mobile)
-    return wrap(body,w,h,'Profile boot sequence','A decorative boot sequence introduces Luca’s software tools, public repositories and GitHub profile. This is an animation, not a build or health report.')
+def composition(data, theme, mobile):
+    groups = language_groups(data)
+    out = section(3, 'LANGUAGE COMPOSITION', 1304 if mobile else 918, mobile, '' if mobile or not groups else '100.0%')
+    if groups:
+        x, y, width = (62, 1340, 380) if mobile else (94, 943, 730)
+        widths = apportion([size for _, size, _ in groups], width * 100)
+        label = ', '.join(f'{name} {pct:.1f} percent' for name, _, pct in groups)
+        out += f'<g id="language-bar" aria-label="{e(label)}">\n'
+        offset = 0
+        for units, color in zip(widths, ('blue', 'secondary', 'other')):
+            out += f'<rect x="{x + offset / 100:.2f}" y="{y}" width="{units / 100:.2f}" height="12" fill="{theme[color]}"/>\n'
+            offset += units
+        out += '</g>\n'
+        for n, (name, _, pct) in enumerate(groups):
+            x = [62, 202, 342][n] if mobile else [94, 410, 686][n]
+            out += txt(x, 1393 if mobile else 1001, f'{pct:.1f}%', 'mono blue' if n == 0 else 'mono ink', 28 if mobile else 32, 'font-weight="600" letter-spacing="-1"')
+            out += txt(x, 1425 if mobile else 1029, short(name, 10 if mobile else 14), 'mono label muted')
+    else:
+        out += txt(62 if mobile else 94, 1393 if mobile else 986, 'No language data available.', 'mono label muted')
+    if mobile:
+        out += txt(62, 1460, 'Original sources · byte share', 'mono label muted')
+    return out + rule(62 if mobile else 94, 1490 if mobile else 1059, 442 if mobile else 824, theme)
 
 
-def hexdump(mobile=False):
-    raw=b'luca-1802\x00Python\x00TypeScript\x00React\x00Docker\x00Git\x00CLI\x00'
-    step=8 if mobile else 16
-    rows=[raw[n:n+step] for n in range(0,len(raw),step)]
-    w,h=(480,93+len(rows)*29) if mobile else (960,101+len(rows)*29)
-    body=head(w,'hexdump -C profile.bin',str(len(raw))+' BYTES' if not mobile else '',mobile)
-    body += rect(10,52,w-20,27,BLUE,'class="hexlight" opacity=".07"')
-    for n,chunk in enumerate(rows):
-        y=72+n*29
-        body += txt(15,y,f'{n*step:04x}' if mobile else f'{n*step:08x}',15 if mobile else 13,MUTED)
-        body += txt(73 if mobile else 123,y,' '.join(f'{v:02x}' for v in chunk),16 if mobile else 14,BLUE)
-        chars=''.join(chr(v) if 32<=v<127 else '.' for v in chunk)
-        if not mobile:
-            body += txt(714,y,'|'+chars+'|',13)
-    body += foot(w,h,'ASCII / UTF-8','profile identity bytes' if not mobile else '',mobile)
-    return wrap(body,w,h,'Profile hex dump','A decorative hexadecimal encoding of luca-1802, Python, TypeScript, React, Docker, Git and CLI.')
+def toolchain(theme, mobile):
+    out = section(4, 'TOOLCHAIN', 1530 if mobile else 1099, mobile)
+    if mobile:
+        out += txt(62, 1570, 'Python / TypeScript', 'mono ink', 18)
+        out += txt(62, 1602, 'React / Docker / Git', 'mono ink', 18)
+    else:
+        for x, value in [(94, 'Python'), (196, '/'), (233, 'TypeScript'), (382, '/'), (419, 'React'), (510, '/'), (547, 'Docker'), (649, '/'), (686, 'Git')]:
+            out += txt(x, 1138, value, 'mono muted' if value == '/' else 'mono ink', 18)
+    return out + rule(62 if mobile else 94, 1632 if mobile else 1168, 442 if mobile else 824, theme)
 
 
-def repos(data, mobile=False):
-    rows=[r for r in data['repos'] if not r['is_fork'] and r['name'].lower()!=data['login'].lower()][:6]
-    w,h=(480,88+max(1,len(rows))*77) if mobile else (960,124+max(1,len(rows))*38)
-    body=head(w,'top --public --no-forks','REPOSITORY TABLE' if not mobile else '',mobile)
-    if not mobile:
-        body += txt(18,68,'REPOSITORY',12,MUTED)+txt(434,68,'LANGUAGE',12,MUTED)+txt(638,68,'STARS',12,MUTED)+txt(742,68,'FORKS',12,MUTED)+txt(835,68,'PUSHED',12,MUTED)
-        body += line(12,80,948,80)
-    for n,r in enumerate(rows):
-        y=70+n*77 if mobile else 107+n*38
-        body += rect(12,y-21,w-24,60 if mobile else 31,BLUE,f'class="rowlight" style="--delay:{n*2}s" opacity="0"')
-        body += txt(18,y,short(r['name'],32),20 if mobile else 15,WHITE,'font-weight="700"')
+def changelog(data, theme, mobile):
+    rows = recent_commits(data)
+    out = section(5, 'CHANGELOG EXCERPT', 1672 if mobile else 1208, mobile, '' if mobile else 'PUBLIC COMMIT REFERENCES')
+    if mobile:
+        out += txt(62, 1704, 'Public commit references', 'mono label muted')
+    for n, row in enumerate(rows):
+        y = 1743 + n * 78 if mobile else 1250 + n * 42
+        out += txt(62 if mobile else 94, y, row['sha'][:7], 'mono blue', 18)
+        out += txt(62 if mobile else 259, y + 28 if mobile else y, short(row['repo'], 34 if mobile else 47), 'mono ink', 18)
         if mobile:
-            body += txt(18,y+27,f"{r['language'] or '—'}  /  {r['stars']} stars  /  {r['forks']} forks",14,BLUE)
-        else:
-            body += txt(434,y,short(r['language'] or '—',17),14,BLUE)+txt(638,y,r['stars'],14)+txt(742,y,r['forks'],14)+txt(835,y,(r['pushed_at'] or '')[:10] or '—',12,MUTED)
+            out += txt(442, y, row['created_at'][:10], 'mono meta muted', extra='text-anchor="end"')
     if not rows:
-        body += txt(18,70,'No public projects yet.',16,MUTED)
-    body += foot(w,h,f'{len(rows)} original public projects','updated '+data['sampled_at'][:10] if not mobile else '',mobile)
-    return wrap(body,w,h,'Public repository table','Original public repositories, showing language, stars, forks and last push. '+', '.join(r['name'] for r in rows))
+        out += txt(62 if mobile else 94, 1755 if mobile else 1250, 'No sampled public commits.', 'mono label muted')
+    elif not mobile:
+        out += '<path d="M235 1233V1339" class="rule"/>\n'
+        for n in range(len(rows)):
+            out += rule(806, 1244 + n * 42, 824, theme)
+    return out + rule(62 if mobile else 94, 1961 if mobile else 1372, 442 if mobile else 824, theme, True)
 
 
-def languages(data, mobile=False):
-    rows=data['languages'][:8]
-    w,h=(480,83+max(1,len(rows))*63) if mobile else (960,90+max(1,len(rows))*37)
-    body=head(w,'du --languages','SOURCE BYTES' if not mobile else '',mobile)
-    for n,row in enumerate(rows):
-        y=67+n*(63 if mobile else 37)
-        pct=row['percentage']
-        col=PALETTE[n%len(PALETTE)]
-        body += txt(18,y,short(row['name'],20),18 if mobile else 14,WHITE)
-        bx,by,bw=(18,y+11,443) if mobile else (177,y-14,638)
-        body += rect(bx,by,bw,9 if mobile else 17,SURFACE)
-        body += rect(bx,by,round(bw*pct/100,2),9 if mobile else 17,col,'class="meter"')
-        body += txt(w-18,y,f'{pct:.1f}%',16 if mobile else 13,col,'text-anchor="end"')
-    if not rows:
-        body += txt(18,64,'No language data available.',16,MUTED)
-    body += foot(w,h,'original repos / excluding forks','top source languages' if not mobile else '',mobile)
-    return wrap(body,w,h,'Source language distribution','Public original repository language byte distribution: '+', '.join(f"{r['name']} {r['percentage']:.1f}%" for r in rows))
+def footer(data, theme, mobile):
+    x, rx = (62, 442) if mobile else (94, 824)
+    out = txt(x, 2001 if mobile else 1409, 'DOCUMENT NOTE', 'mono meta blue', extra='font-weight="700"')
+    if mobile:
+        out += txt(x, 2039, 'A public profile, rendered', 'sans ink', 20)
+        out += txt(x, 2069, 'as a software artifact.', 'sans ink', 20)
+    else:
+        out += txt(x, 1443, 'A public profile, rendered as a software artifact.', 'sans ink', 20)
+    out += txt(x, 2110 if mobile else 1475, 'Public snapshot · refreshed daily.', 'mono label muted')
+    out += rule(x, 2150 if mobile else 1513, rx, theme)
+    out += txt(x, 2190 if mobile else 1541, 'github.com/' + data['login'], 'mono ink' if mobile else 'mono meta ink', 16 if mobile else None)
+    out += txt(rx, 2224 if mobile else 1541, 'END OF MANIFEST', 'mono meta muted', extra='text-anchor="end"')
+    path = 'M450 30H460V40M460 2220V2230H450' if mobile else 'M844 38H862V56M862 1544V1562H844'
+    return out + f'<path d="{path}" stroke="{theme["blue"]}" stroke-width="1" fill="none"/>\n'
 
 
-def events(data, mobile=False):
-    rows=data['commits'][:6]
-    w,h=(480,89+max(1,len(rows))*70) if mobile else (960,93+max(1,len(rows))*33)
-    body=head(w,'git log -6 --public','RECENT COMMITS' if not mobile else '',mobile)
-    for n,row in enumerate(rows):
-        y=68+n*(70 if mobile else 33)
-        ts=row['created_at'].replace('T',' ')[:16]
-        name=row['repo'].split('/')[-1]
-        body += rect(12,y-20,w-24,57 if mobile else 28,BLUE,f'class="rowlight" style="--delay:{n*1.5}s" opacity="0"')
-        if mobile:
-            body += txt(18,y,ts,13,MUTED)+txt(w-18,y,short(row['message'],19),13,BLUE,'text-anchor="end"')
-            body += txt(18,y+28,short(name,34),19,WHITE)
-        else:
-            body += txt(18,y,ts,12,MUTED)+txt(191,y,short(row['message'],24),13,BLUE)+txt(441,y,short(name,42),14)
-    if not rows:
-        body += txt(18,68,'No commits in public repositories yet.',15,MUTED)
-    body += foot(w,h,'public commits / UTC','updated '+data['sampled_at'][:10] if not mobile else '',mobile)
-    return wrap(body,w,h,'Recent public commit log','Recent commits in public repositories. '+ '; '.join(f"{r['created_at']}: {r['message']} in {r['repo']}" for r in rows))
+def manifest(data, theme='light', mobile=False):
+    validate_snapshot(data)
+    if theme not in THEMES:
+        raise ValueError('Unknown Manifest theme')
+    palette = THEMES[theme]
+    out = start_sheet(data, palette, mobile) + identity(data, palette, mobile)
+    for fn in (counts, inventory, composition):
+        out += fn(data, palette, mobile)
+    return out + toolchain(palette, mobile) + changelog(data, palette, mobile) + footer(data, palette, mobile) + '</svg>\n'
 
 
 def transcript(data):
-    parts=['LUCA-1802 / PUBLIC PROFILE', 'Updated '+data['sampled_at'], '', 'Software / automation. Germany.', 'Python, TypeScript, React, Docker, Git, CLI.', '', 'STATISTICS', f"Public repositories: {len(data['repos'])}", f"Stars on original repositories: {sum(r['stars'] for r in data['repos'] if not r['is_fork'])}", f"Followers: {data['profile']['followers']}", '', 'PUBLIC REPOSITORIES']
-    parts += [f"{r['name']} | {r['language'] or 'no language'} | {r['stars']} stars | {r['url']}" for r in data['repos']]
-    parts += ['', 'LANGUAGE BYTES / ORIGINAL REPOSITORIES'] + [f"{r['name']}: {r['percentage']:.1f}% ({r['bytes']} bytes)" for r in data['languages']]
-    parts += ['', 'RECENT PUBLIC COMMITS / UTC'] + [f"{r['created_at']} | {r['message']} | {r['repo']} | {r['url']}" for r in data['commits']]
-    parts += ['', 'RECENT PUBLIC EVENTS / UTC'] + [f"{r['created_at']} | {r['message']} | {r['repo']} | {r['url']}" for r in data['events']]
-    parts += ['', '30-DAY PUBLIC EVENT SAMPLE / NOT TOTAL CONTRIBUTIONS'] + [f"{r['date']}: {r['count']}" for r in data['activity']]
-    return '\n'.join(parts)+'\n'
-
-
-def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--data',type=Path,default=ROOT/'assets/profile-data.json')
-    parser.add_argument('--output-dir',type=Path,default=ROOT/'assets')
-    args=parser.parse_args()
-    data=json.loads(args.data.read_text(encoding='utf-8'))
-    if data['schema_version']!=1 or data['login']!='luca-1802':
-        raise ValueError('Unexpected profile snapshot identity or schema')
+    validate_snapshot(data)
+    profile = data['profile']
+    parts = ['LUCA-1802 / PUBLIC SOFTWARE MANIFEST', 'Sampled ' + data['sampled_at'],
+             'Public snapshot · refreshed daily.', 'https://github.com/' + data['login'], '',
+             'Luca. Software & automation. Germany.', 'Python, TypeScript, React, Docker, Git, CLI.', '',
+             'STATISTICS', f"Public repositories: {len(data['repos'])}",
+             f"Stars on original repositories: {sum(r['stars'] for r in data['repos'] if not r['is_fork'])}",
+             f"Followers: {profile['followers']}", f"Languages: {len(data['languages'])}",
+             f"Following: {profile['following']}", f"Account created: {profile['created_at']}",
+             f"Profile name in snapshot: {profile['name']}", f"API public repository count: {profile['public_repos']}", '',
+             'SELECTED ORIGINAL PUBLIC PROJECTS']
+    for row in selected_projects(data):
+        parts.append(f"{row['name']} | {row['url']}")
+    parts += ['', 'ALL PUBLIC REPOSITORIES']
+    for row in data['repos']:
+        parts += [f"{row['name']} | {'fork' if row['is_fork'] else 'original'} | {row['language'] or 'no language'} | {row['stars']} stars | {row['forks']} forks | pushed {row['pushed_at'] or 'unknown'} | {row['url']}",
+                  'Description: ' + (row['description'] or 'none supplied')]
+    parts += ['', 'LANGUAGE BYTES / ORIGINAL REPOSITORIES / EXCLUDING PROFILE REPOSITORY']
+    total = sum(row['bytes'] for row in data['languages'])
     for row in data['languages']:
-        if not 0<=row['percentage']<=100:
-            raise ValueError('Invalid language percentage')
-    assets={'mark.svg':mark()}
-    for name,fn in [('hero',hero),('stats',stats),('repos',repos),('languages',languages),('events',events)]:
-        for mobile in (False,True):
-            assets[name+('-mobile' if mobile else '')+'.svg']=fn(data,mobile)
-    for name,fn in [('ticker',ticker),('boot',boot),('hexdump',hexdump)]:
-        for mobile in (False,True):
-            assets[name+('-mobile' if mobile else '')+'.svg']=fn(mobile)
-    for content in assets.values():
-        ET.fromstring(content)
-    args.output_dir.mkdir(parents=True,exist_ok=True)
-    for name,content in assets.items():
-        (args.output_dir/name).write_text(content,encoding='utf-8',newline='\n')
-    (args.output_dir/'profile.txt').write_text(transcript(data),encoding='utf-8',newline='\n')
-    print(f'Rendered {len(assets)} SVG assets and an accessible text view.')
+        parts.append(f"{row['name']}: {100 * row['bytes'] / total if total else 0:.2f}% ({row['bytes']} bytes)")
+    parts += ['', 'MANIFEST LANGUAGE COMPOSITION / TOP TWO PLUS OTHER',
+              'Shares are derived from bytes and apportioned to total 100.0% at one decimal.']
+    parts += [f'{name}: {pct:.1f}% ({size} bytes)' for name, size, pct in language_groups(data)]
+    parts += ['', 'RECENT PUBLIC COMMITS / UTC',
+              'Bounded sample: up to three default-branch commits per public original repository; eight most recent retained. Not total contributions.']
+    parts += [f"{row['created_at']} | {row['sha']} | {row['repo']} | {row['url']}" for row in data['commits']]
+    parts += ['', 'RECENT PUBLIC EVENTS / UTC']
+    parts += [f"{row['created_at']} | {row['kind']} | {row['message']} | {row['repo']} | {row['url']}" for row in data['events']]
+    parts += ['', '30-DAY PUBLIC EVENT SAMPLE / NOT TOTAL CONTRIBUTIONS',
+              'Sample of up to 300 public feed events, filtered to owned public repositories; recent-event details retain up to 12 entries.']
+    parts += [f"{row['date']}: {row['count']}" for row in data['activity']]
+    return '\n'.join(parts) + '\n'
 
 
-if __name__=='__main__':
-    main()
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--data', type=Path, default=ROOT / 'assets/profile-data.json')
+    parser.add_argument('--output-dir', type=Path, default=ROOT / 'assets')
+    args = parser.parse_args(argv)
+    try:
+        data = validate_snapshot(json.loads(args.data.read_text(encoding='utf-8')))
+        assets = {}
+        for theme in THEMES:
+            for mobile in (False, True):
+                name = f'manifest-{theme}{"-mobile" if mobile else ""}.svg'
+                assets[name] = manifest(data, theme, mobile)
+                ET.fromstring(assets[name])
+        assets['profile.txt'] = transcript(data)
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        for name, content in assets.items():
+            (args.output_dir / name).write_text(content, encoding='utf-8', newline='\n')
+    except (ValueError, OSError, ET.ParseError) as error:
+        parser.exit(1, f'Manifest rendering failed: {error}\n')
+    print('Rendered 4 Manifest SVG assets and an accessible text view.')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

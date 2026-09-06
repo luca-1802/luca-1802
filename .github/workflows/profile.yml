@@ -9,6 +9,7 @@ on:
     paths:
       - 'scripts/**'
       - 'tests/**'
+      - 'README.md'
       - '.github/workflows/profile.yml'
 
 permissions:
@@ -40,7 +41,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/collect_public.py
-      - name: Render dashboard assets
+      - name: Render Manifest editions
         run: python scripts/render_profile.py
       - name: Commit updated assets
         run: |
@@ -51,5 +52,5 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'chore: refresh public profile dashboard'
+          git commit -m 'chore: refresh public profile manifest'
           git push origin HEAD:main

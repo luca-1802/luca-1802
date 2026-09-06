@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1600" viewBox="0 0 900 1600" role="img" aria-labelledby="title description">
+<title id="title">Luca — Public software manifest</title>
+<desc id="description">Luca, luca-1802, Germany. Software and automation. 5 public repositories, 2 stars on original repositories, 6 followers, 7 source languages. Public snapshot sampled 2026-09-06T15:17:54Z. Selected projects: password-manager, file-organizer, weather-cli. Language shares use bytes from original repositories, excluding the profile repository. Public commit references are a bounded default-branch sample, not total contributions. Full details and links are in the accompanying profile.txt. The decorative barcode is the only animation and respects reduced motion.</desc>
+<defs>
+  <pattern id="registration-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#164ee6" stroke-width="0.6" opacity="0.08"/></pattern>
+  <clipPath id="barcode-clip"><rect x="658" y="131" width="166" height="62"/></clipPath>
+  <style>
+    .mono { font-family: 'Cascadia Mono', 'Consolas', 'Liberation Mono', monospace; }
+    .sans { font-family: 'Bahnschrift', 'DIN Alternate', 'Segoe UI', sans-serif; }
+    .ink { fill: #222b3a; }
+    .muted { fill: #637084; }
+    .blue { fill: #164ee6; }
+    .meta { font-size: 14px; letter-spacing: 0.5px; }
+    .label { font-size: 16px; }
+    .rule { stroke: #d8e0ec; stroke-width: 1; }
+    .scan { animation: scan 7s ease-in-out infinite; }
+    @keyframes scan {
+      0%, 16% { transform: translateX(0); opacity: 0.25; }
+      55% { transform: translateX(146px); opacity: 0.65; }
+      80%, 100% { transform: translateX(0); opacity: 0.25; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scan { animation: none; transform: none; opacity: 0.35; }
+    }
+  </style>
+</defs>
+<rect width="900" height="1600" fill="#f1f5fb"/>
+<path d="M18 18H882V1582H18Z" fill="#fdfefe" stroke="#d8e0ec"/>
+<path d="M62 18V1582" class="rule" stroke-dasharray="2 5"/>
+<rect x="18" y="18" width="8" height="86" fill="#164ee6"/>
+<g fill="#f1f5fb" stroke="#d8e0ec" stroke-width="1" aria-hidden="true">
+<circle cx="39" cy="139" r="6"/>
+<circle cx="39" cy="367" r="6"/>
+<circle cx="39" cy="595" r="6"/>
+<circle cx="39" cy="823" r="6"/>
+<circle cx="39" cy="1051" r="6"/>
+<circle cx="39" cy="1279" r="6"/>
+<circle cx="39" cy="1507" r="6"/>
+</g>
+<text x="94" y="62" class="mono meta blue" font-weight="700">MANIFEST</text>
+<text x="824" y="62" class="mono meta muted" text-anchor="end">SNAPSHOT · 2026-09-06</text>
+<path d="M94 84H824" stroke="#222b3a" stroke-width="1.5"/>
+<text x="94" y="124" class="mono meta muted" >PUBLIC SOFTWARE MANIFEST</text>
+<text x="90" y="195" class="sans ink" font-size="68" font-weight="650" letter-spacing="-2">Luca</text>
+<text x="94" y="229" class="mono blue" font-size="22" >@luca-1802</text>
+<g aria-hidden="true"><rect x="650" y="122" width="182" height="80" fill="url(#registration-grid)"/>
+<rect x="658" y="131" width="3" height="62" fill="#222b3a"/>
+<rect x="665" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="670" y="131" width="5" height="62" fill="#222b3a"/>
+<rect x="679" y="131" width="2" height="62" fill="#222b3a"/>
+<rect x="685" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="690" y="131" width="4" height="62" fill="#222b3a"/>
+<rect x="698" y="131" width="2" height="62" fill="#222b3a"/>
+<rect x="704" y="131" width="6" height="62" fill="#222b3a"/>
+<rect x="714" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="719" y="131" width="3" height="62" fill="#222b3a"/>
+<rect x="726" y="131" width="2" height="62" fill="#222b3a"/>
+<rect x="732" y="131" width="5" height="62" fill="#222b3a"/>
+<rect x="741" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="746" y="131" width="2" height="62" fill="#222b3a"/>
+<rect x="752" y="131" width="4" height="62" fill="#222b3a"/>
+<rect x="760" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="765" y="131" width="6" height="62" fill="#222b3a"/>
+<rect x="775" y="131" width="2" height="62" fill="#222b3a"/>
+<rect x="781" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="786" y="131" width="4" height="62" fill="#222b3a"/>
+<rect x="794" y="131" width="2" height="62" fill="#222b3a"/>
+<rect x="800" y="131" width="5" height="62" fill="#222b3a"/>
+<rect x="809" y="131" width="1" height="62" fill="#222b3a"/>
+<rect x="814" y="131" width="3" height="62" fill="#222b3a"/>
+<rect x="821" y="131" width="3" height="62" fill="#222b3a"/>
+<g clip-path="url(#barcode-clip)"><rect class="scan" x="660" y="131" width="18" height="62" fill="#164ee6" opacity="0.35"/></g></g>
+<text x="824" y="223" class="mono meta muted" text-anchor="end">ID / LUCA-1802</text>
+<text x="94" y="279" class="sans ink" font-size="29" >Software &amp; automation</text>
+<text x="824" y="279" class="mono label ink" text-anchor="end">DE / Germany</text>
+<path d="M94 310H824" stroke="#222b3a" stroke-width="1.5"/>
+<text x="34" y="348" class="mono meta blue" transform="rotate(-90 34 348)">01</text>
+<text x="94" y="348" class="mono meta blue" font-weight="700">PROFILE COUNTS</text>
+<text x="824" y="348" class="mono meta muted" text-anchor="end">SNAPSHOT VALUES</text>
+<text x="94" y="413" class="mono ink" font-size="48" font-weight="600" letter-spacing="-2">05</text>
+<text x="94" y="443" class="mono label muted" >Public repos</text>
+<text x="282" y="413" class="mono ink" font-size="48" font-weight="600" letter-spacing="-2">02</text>
+<text x="282" y="443" class="mono label muted" >Stars</text>
+<text x="470" y="413" class="mono ink" font-size="48" font-weight="600" letter-spacing="-2">06</text>
+<text x="470" y="443" class="mono label muted" >Followers</text>
+<text x="658" y="413" class="mono ink" font-size="48" font-weight="600" letter-spacing="-2">07</text>
+<text x="658" y="443" class="mono label muted" >Languages</text>
+<path d="M257 378V448M445 378V448M633 378V448" class="rule"/>
+<path d="M94 475H824" stroke="#d8e0ec" stroke-width="1"/>
+<text x="34" y="515" class="mono meta blue" transform="rotate(-90 34 515)">02</text>
+<text x="94" y="515" class="mono meta blue" font-weight="700">PACKAGE INVENTORY</text>
+<text x="824" y="515" class="mono meta muted" text-anchor="end">03 SELECTED / 05 PUBLIC</text>
+<text x="94" y="556" class="mono meta muted" >PACKAGE</text>
+<text x="385" y="556" class="mono meta muted" >PURPOSE / RUNTIME</text>
+<text x="824" y="556" class="mono meta muted" text-anchor="end">NO.</text>
+<path d="M94 572H824" stroke="#222b3a" stroke-width="1.5"/>
+<text x="94" y="611" class="mono ink" font-size="20" font-weight="600">password-manager</text>
+<text x="94" y="638" class="mono meta muted" >APPLICATION</text>
+<text x="385" y="611" class="mono label ink" >Self-hosted vault</text>
+<text x="385" y="638" class="mono label muted" >TypeScript · React</text>
+<text x="385" y="662" class="mono label muted" >Python</text>
+<text x="824" y="611" class="mono label blue" text-anchor="end">01</text>
+<path d="M94 684H824" stroke="#d8e0ec" stroke-width="1"/>
+<text x="94" y="724" class="mono ink" font-size="20" font-weight="600">file-organizer</text>
+<text x="94" y="751" class="mono meta muted" >UTILITY</text>
+<text x="385" y="724" class="mono label ink" >File classification</text>
+<text x="385" y="751" class="mono label muted" >Python</text>
+<text x="824" y="724" class="mono label blue" text-anchor="end">02</text>
+<path d="M94 781H824" stroke="#d8e0ec" stroke-width="1"/>
+<text x="94" y="821" class="mono ink" font-size="20" font-weight="600">weather-cli</text>
+<text x="94" y="848" class="mono meta muted" >COMMAND-LINE TOOL</text>
+<text x="385" y="821" class="mono label ink" >OpenWeather client</text>
+<text x="385" y="848" class="mono label muted" >Python · OpenWeather</text>
+<text x="824" y="821" class="mono label blue" text-anchor="end">03</text>
+<path d="M94 878H824" stroke="#222b3a" stroke-width="1.5"/>
+<text x="34" y="918" class="mono meta blue" transform="rotate(-90 34 918)">03</text>
+<text x="94" y="918" class="mono meta blue" font-weight="700">LANGUAGE COMPOSITION</text>
+<text x="824" y="918" class="mono meta muted" text-anchor="end">100.0%</text>
+<g id="language-bar" aria-label="TypeScript 66.8 percent, Python 29.0 percent, Other 4.2 percent">
+<rect x="94.00" y="943" width="487.33" height="12" fill="#164ee6"/>
+<rect x="581.33" y="943" width="212.07" height="12" fill="#65738b"/>
+<rect x="793.40" y="943" width="30.60" height="12" fill="#dbe3ef"/>
+</g>
+<text x="94" y="1001" class="mono blue" font-size="32" font-weight="600" letter-spacing="-1">66.8%</text>
+<text x="94" y="1029" class="mono label muted" >TypeScript</text>
+<text x="410" y="1001" class="mono ink" font-size="32" font-weight="600" letter-spacing="-1">29.0%</text>
+<text x="410" y="1029" class="mono label muted" >Python</text>
+<text x="686" y="1001" class="mono ink" font-size="32" font-weight="600" letter-spacing="-1">4.2%</text>
+<text x="686" y="1029" class="mono label muted" >Other</text>
+<path d="M94 1059H824" stroke="#d8e0ec" stroke-width="1"/>
+<text x="34" y="1099" class="mono meta blue" transform="rotate(-90 34 1099)">04</text>
+<text x="94" y="1099" class="mono meta blue" font-weight="700">TOOLCHAIN</text>
+<text x="94" y="1138" class="mono ink" font-size="18" >Python</text>
+<text x="196" y="1138" class="mono muted" font-size="18" >/</text>
+<text x="233" y="1138" class="mono ink" font-size="18" >TypeScript</text>
+<text x="382" y="1138" class="mono muted" font-size="18" >/</text>
+<text x="419" y="1138" class="mono ink" font-size="18" >React</text>
+<text x="510" y="1138" class="mono muted" font-size="18" >/</text>
+<text x="547" y="1138" class="mono ink" font-size="18" >Docker</text>
+<text x="649" y="1138" class="mono muted" font-size="18" >/</text>
+<text x="686" y="1138" class="mono ink" font-size="18" >Git</text>
+<path d="M94 1168H824" stroke="#d8e0ec" stroke-width="1"/>
+<text x="34" y="1208" class="mono meta blue" transform="rotate(-90 34 1208)">05</text>
+<text x="94" y="1208" class="mono meta blue" font-weight="700">CHANGELOG EXCERPT</text>
+<text x="824" y="1208" class="mono meta muted" text-anchor="end">PUBLIC COMMIT REFERENCES</text>
+<text x="94" y="1250" class="mono blue" font-size="18" >22b7850</text>
+<text x="259" y="1250" class="mono ink" font-size="18" >luca-1802</text>
+<text x="94" y="1292" class="mono blue" font-size="18" >0126a4b</text>
+<text x="259" y="1292" class="mono ink" font-size="18" >luca-1802</text>
+<text x="94" y="1334" class="mono blue" font-size="18" >c440865</text>
+<text x="259" y="1334" class="mono ink" font-size="18" >luca-1802</text>
+<path d="M235 1233V1339" class="rule"/>
+<path d="M806 1244H824" stroke="#d8e0ec" stroke-width="1"/>
+<path d="M806 1286H824" stroke="#d8e0ec" stroke-width="1"/>
+<path d="M806 1328H824" stroke="#d8e0ec" stroke-width="1"/>
+<path d="M94 1372H824" stroke="#222b3a" stroke-width="1.5"/>
+<text x="94" y="1409" class="mono meta blue" font-weight="700">DOCUMENT NOTE</text>
+<text x="94" y="1443" class="sans ink" font-size="20" >A public profile, rendered as a software artifact.</text>
+<text x="94" y="1475" class="mono label muted" >Public snapshot · refreshed daily.</text>
+<path d="M94 1513H824" stroke="#d8e0ec" stroke-width="1"/>
+<text x="94" y="1541" class="mono meta ink" >github.com/luca-1802</text>
+<text x="824" y="1541" class="mono meta muted" text-anchor="end">END OF MANIFEST</text>
+<path d="M844 38H862V56M862 1544V1562H844" stroke="#164ee6" stroke-width="1" fill="none"/>
+</svg>

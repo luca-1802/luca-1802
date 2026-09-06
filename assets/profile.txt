@@ -1,44 +1,69 @@
-LUCA-1802 / PUBLIC PROFILE
-Updated 2026-09-06T14:45:55Z
+LUCA-1802 / PUBLIC SOFTWARE MANIFEST
+Sampled 2026-09-06T15:17:54Z
+Public snapshot · refreshed daily.
+https://github.com/luca-1802
 
-Software / automation. Germany.
+Luca. Software & automation. Germany.
 Python, TypeScript, React, Docker, Git, CLI.
 
 STATISTICS
 Public repositories: 5
 Stars on original repositories: 2
 Followers: 6
+Languages: 7
+Following: 5
+Account created: 2022-10-20T11:12:46Z
+Profile name in snapshot: Luca
+API public repository count: 5
 
-PUBLIC REPOSITORIES
-password-manager | TypeScript | 2 stars | https://github.com/luca-1802/password-manager
-file-organizer | Python | 0 stars | https://github.com/luca-1802/file-organizer
-luca-1802 | Python | 0 stars | https://github.com/luca-1802/luca-1802
-weather-cli | Python | 0 stars | https://github.com/luca-1802/weather-cli
-github-readme-stats | no language | 0 stars | https://github.com/luca-1802/github-readme-stats
+SELECTED ORIGINAL PUBLIC PROJECTS
+password-manager | https://github.com/luca-1802/password-manager
+file-organizer | https://github.com/luca-1802/file-organizer
+weather-cli | https://github.com/luca-1802/weather-cli
 
-LANGUAGE BYTES / ORIGINAL REPOSITORIES
+ALL PUBLIC REPOSITORIES
+password-manager | original | TypeScript | 2 stars | 0 forks | pushed 2026-03-02T11:00:39Z | https://github.com/luca-1802/password-manager
+Description: Self-hosted password manager with AES-256-GCM encryption and Argon2id key derivation. Includes a React web dashboard, Chrome extension with auto-fill, and CLI — all sharing one encrypted vault. Featur
+file-organizer | original | Python | 0 stars | 0 forks | pushed 2026-02-22T15:58:23Z | https://github.com/luca-1802/file-organizer
+Description: none supplied
+luca-1802 | original | Python | 0 stars | 0 forks | pushed 2026-09-06T14:46:00Z | https://github.com/luca-1802/luca-1802
+Description: none supplied
+weather-cli | original | Python | 0 stars | 0 forks | pushed 2026-02-22T11:42:26Z | https://github.com/luca-1802/weather-cli
+Description: none supplied
+github-readme-stats | fork | no language | 0 stars | 0 forks | pushed 2026-02-14T10:09:30Z | https://github.com/luca-1802/github-readme-stats
+Description: :zap: Dynamically generated stats for your github readmes
+
+LANGUAGE BYTES / ORIGINAL REPOSITORIES / EXCLUDING PROFILE REPOSITORY
+TypeScript: 66.76% (465853 bytes)
+Python: 29.05% (202728 bytes)
+CSS: 1.97% (13771 bytes)
+SCSS: 1.06% (7421 bytes)
+HTML: 0.79% (5539 bytes)
+JavaScript: 0.28% (1930 bytes)
+Dockerfile: 0.08% (586 bytes)
+
+MANIFEST LANGUAGE COMPOSITION / TOP TWO PLUS OTHER
+Shares are derived from bytes and apportioned to total 100.0% at one decimal.
 TypeScript: 66.8% (465853 bytes)
-Python: 29.1% (202728 bytes)
-CSS: 2.0% (13771 bytes)
-SCSS: 1.1% (7421 bytes)
-HTML: 0.8% (5539 bytes)
-JavaScript: 0.3% (1930 bytes)
-Dockerfile: 0.1% (586 bytes)
+Python: 29.0% (202728 bytes)
+Other: 4.2% (29247 bytes)
 
 RECENT PUBLIC COMMITS / UTC
-2026-09-06T14:45:41Z | commit 0126a4b | luca-1802 | https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90
-2026-09-06T14:26:47Z | commit c440865 | luca-1802 | https://github.com/luca-1802/luca-1802/commit/c4408652452b1524c30b91010f743b19b580ea38
-2026-07-21T10:34:59Z | commit f6d36c8 | luca-1802 | https://github.com/luca-1802/luca-1802/commit/f6d36c8a165781195cb706cd519980a09fb129ff
-2026-03-02T11:00:38Z | commit b18ccc6 | password-manager | https://github.com/luca-1802/password-manager/commit/b18ccc64c4d103f875522adc120e4f3af5e4dd15
-2026-03-02T10:04:46Z | commit 9a01b85 | password-manager | https://github.com/luca-1802/password-manager/commit/9a01b85a53ac69119ce7103cf54cd916ab63d135
-2026-02-27T07:55:28Z | commit 76ab05b | password-manager | https://github.com/luca-1802/password-manager/commit/76ab05bfcd3efa0fa2b7b9489554b42bbe5a53b5
-2026-02-22T15:58:14Z | commit c416015 | file-organizer | https://github.com/luca-1802/file-organizer/commit/c4160152a57753b06177560c8c2dccb0fbe41b07
-2026-02-22T11:42:22Z | commit 4528c2e | weather-cli | https://github.com/luca-1802/weather-cli/commit/4528c2e66a86a3c8339b3bd6e8172756cddd1767
+Bounded sample: up to three default-branch commits per public original repository; eight most recent retained. Not total contributions.
+2026-09-06T14:45:59Z | 22b7850029793b0d2f22cabb7dbd4ab02278a077 | luca-1802 | https://github.com/luca-1802/luca-1802/commit/22b7850029793b0d2f22cabb7dbd4ab02278a077
+2026-09-06T14:45:41Z | 0126a4be73c7319b95ab652ea6241956c16c3a90 | luca-1802 | https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90
+2026-09-06T14:26:47Z | c4408652452b1524c30b91010f743b19b580ea38 | luca-1802 | https://github.com/luca-1802/luca-1802/commit/c4408652452b1524c30b91010f743b19b580ea38
+2026-03-02T11:00:38Z | b18ccc64c4d103f875522adc120e4f3af5e4dd15 | password-manager | https://github.com/luca-1802/password-manager/commit/b18ccc64c4d103f875522adc120e4f3af5e4dd15
+2026-03-02T10:04:46Z | 9a01b85a53ac69119ce7103cf54cd916ab63d135 | password-manager | https://github.com/luca-1802/password-manager/commit/9a01b85a53ac69119ce7103cf54cd916ab63d135
+2026-02-27T07:55:28Z | 76ab05bfcd3efa0fa2b7b9489554b42bbe5a53b5 | password-manager | https://github.com/luca-1802/password-manager/commit/76ab05bfcd3efa0fa2b7b9489554b42bbe5a53b5
+2026-02-22T15:58:14Z | c4160152a57753b06177560c8c2dccb0fbe41b07 | file-organizer | https://github.com/luca-1802/file-organizer/commit/c4160152a57753b06177560c8c2dccb0fbe41b07
+2026-02-22T11:42:22Z | 4528c2e66a86a3c8339b3bd6e8172756cddd1767 | weather-cli | https://github.com/luca-1802/weather-cli/commit/4528c2e66a86a3c8339b3bd6e8172756cddd1767
 
 RECENT PUBLIC EVENTS / UTC
-2026-09-06T14:45:45Z | Pushed commits | luca-1802 | https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90
+2026-09-06T14:45:45Z | PushEvent | Pushed commits | luca-1802 | https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90
 
 30-DAY PUBLIC EVENT SAMPLE / NOT TOTAL CONTRIBUTIONS
+Sample of up to 300 public feed events, filtered to owned public repositories; recent-event details retain up to 12 entries.
 2026-08-08: 0
 2026-08-09: 0
 2026-08-10: 0
