@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "login": "luca-1802",
-  "sampled_at": "2026-09-06T14:42:07Z",
+  "sampled_at": "2026-09-06T14:45:55Z",
   "profile": {
     "name": "Luca",
     "followers": 6,
@@ -35,10 +35,10 @@
       "url": "https://github.com/luca-1802/luca-1802",
       "stars": 0,
       "forks": 0,
-      "language": null,
+      "language": "Python",
       "description": "",
       "is_fork": false,
-      "pushed_at": "2026-09-06T14:26:50Z"
+      "pushed_at": "2026-09-06T14:45:44Z"
     },
     {
       "name": "weather-cli",
@@ -100,6 +100,13 @@
   ],
   "commits": [
     {
+      "sha": "0126a4be73c7319b95ab652ea6241956c16c3a90",
+      "created_at": "2026-09-06T14:45:41Z",
+      "repo": "luca-1802",
+      "message": "commit 0126a4b",
+      "url": "https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90"
+    },
+    {
       "sha": "c4408652452b1524c30b91010f743b19b580ea38",
       "created_at": "2026-09-06T14:26:47Z",
       "repo": "luca-1802",
@@ -135,13 +142,6 @@
       "url": "https://github.com/luca-1802/password-manager/commit/76ab05bfcd3efa0fa2b7b9489554b42bbe5a53b5"
     },
     {
-      "sha": "b1bce9a89cd4aaa86f219b907b0da7fd1fe63f7c",
-      "created_at": "2026-02-22T16:46:06Z",
-      "repo": "luca-1802",
-      "message": "commit b1bce9a",
-      "url": "https://github.com/luca-1802/luca-1802/commit/b1bce9a89cd4aaa86f219b907b0da7fd1fe63f7c"
-    },
-    {
       "sha": "c4160152a57753b06177560c8c2dccb0fbe41b07",
       "created_at": "2026-02-22T15:58:14Z",
       "repo": "file-organizer",
@@ -156,7 +156,15 @@
       "url": "https://github.com/luca-1802/weather-cli/commit/4528c2e66a86a3c8339b3bd6e8172756cddd1767"
     }
   ],
-  "events": [],
+  "events": [
+    {
+      "created_at": "2026-09-06T14:45:45Z",
+      "kind": "PushEvent",
+      "repo": "luca-1802",
+      "message": "Pushed commits",
+      "url": "https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90"
+    }
+  ],
   "activity": [
     {
       "date": "2026-08-08",
@@ -276,7 +284,7 @@
     },
     {
       "date": "2026-09-06",
-      "count": 0
+      "count": 1
     }
   ]
 }
