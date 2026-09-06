@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+<title id="title">Luca microchip monogram</title><desc id="desc">An lc monogram inside a blue microchip with a slowly orbiting signal.</desc>
+<defs><style>
+text{font-family:'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace}
+.pulse{animation:pulse 2.8s ease-in-out infinite}
+.cursor{animation:blink 1.2s step-end infinite}
+.orbit{transform-origin:80px 80px;animation:orbit 32s linear infinite}
+.scan{animation:scan 9s linear infinite}
+.boot{animation:boot 16s linear infinite;animation-delay:var(--delay,0s)}
+.meter{transform-box:fill-box;transform-origin:left;animation:meter 1.2s ease-out both}
+.rowlight{animation:rowlight 10s ease-in-out infinite;animation-delay:var(--delay,0s)}
+.tick{opacity:0;animation:tick 15s linear infinite;animation-delay:var(--delay,0s)}
+.tick.first{opacity:1}
+.hexlight{animation:hexlight 12s steps(7,end) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes scan{from{transform:translateY(-40px)}to{transform:translateY(440px)}}
+@keyframes boot{0%,3%{opacity:.16}8%,85%{opacity:1}92%,100%{opacity:.16}}
+@keyframes meter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rowlight{0%,8%,100%{opacity:0}15%,28%{opacity:.12}35%,95%{opacity:0}}
+@keyframes tick{0%,29%{opacity:1}33%,100%{opacity:0}}
+@keyframes hexlight{from{transform:translateY(0)}to{transform:translateY(196px)}}
+@media(prefers-reduced-motion:reduce){
+ .pulse,.cursor,.orbit,.scan,.boot,.meter,.rowlight,.tick,.hexlight{animation:none!important}
+ .scan,.rowlight,.hexlight{display:none}.tick{opacity:0}.tick.first{opacity:1}
+}
+</style>
+<pattern id="noise" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".45" fill="#75baff" opacity=".065"/></pattern>
+<pattern id="lines" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3H4" stroke="#000" opacity=".15"/></pattern>
+<linearGradient id="scan"><stop stop-color="#75baff" stop-opacity="0"/><stop offset=".5" stop-color="#75baff" stop-opacity=".09"/><stop offset="1" stop-color="#75baff" stop-opacity="0"/></linearGradient>
+<clipPath id="bounds"><rect width="160" height="160"/></clipPath></defs>
+<g clip-path="url(#bounds)"><rect x="0" y="0" width="160" height="160" fill="#080c12" /><rect x="0" y="0" width="160" height="160" fill="url(#noise)" /><g class="orbit"><circle cx="80" cy="80" r="66" fill="none" stroke="#253448" stroke-dasharray="2 7"/><path d="M80 14A66 66 0 0 1 146 80" fill="none" stroke="#75baff"/><rect x="143" y="77" width="6" height="6" fill="#ecf3ff"/></g><rect x="39" y="39" width="82" height="82" fill="#080c12" stroke="#75baff"/><path d="M49 31L49 38" stroke="#8b9fb8" /><path d="M49 122L49 129" stroke="#8b9fb8" /><path d="M31 49H38" stroke="#8b9fb8" /><path d="M122 49H129" stroke="#8b9fb8" /><path d="M60 31L60 38" stroke="#8b9fb8" /><path d="M60 122L60 129" stroke="#8b9fb8" /><path d="M31 60H38" stroke="#8b9fb8" /><path d="M122 60H129" stroke="#8b9fb8" /><path d="M71 31L71 38" stroke="#8b9fb8" /><path d="M71 122L71 129" stroke="#8b9fb8" /><path d="M31 71H38" stroke="#8b9fb8" /><path d="M122 71H129" stroke="#8b9fb8" /><path d="M82 31L82 38" stroke="#8b9fb8" /><path d="M82 122L82 129" stroke="#8b9fb8" /><path d="M31 82H38" stroke="#8b9fb8" /><path d="M122 82H129" stroke="#8b9fb8" /><path d="M93 31L93 38" stroke="#8b9fb8" /><path d="M93 122L93 129" stroke="#8b9fb8" /><path d="M31 93H38" stroke="#8b9fb8" /><path d="M122 93H129" stroke="#8b9fb8" /><path d="M104 31L104 38" stroke="#8b9fb8" /><path d="M104 122L104 129" stroke="#8b9fb8" /><path d="M31 104H38" stroke="#8b9fb8" /><path d="M122 104H129" stroke="#8b9fb8" /><path d="M115 31L115 38" stroke="#8b9fb8" /><path d="M115 122L115 129" stroke="#8b9fb8" /><path d="M31 115H38" stroke="#8b9fb8" /><path d="M122 115H129" stroke="#8b9fb8" /><text x="53" y="87" font-size="36" fill="#ecf3ff" font-weight="700">lc</text><text x="80" y="109" font-size="9" fill="#75baff" text-anchor="middle" letter-spacing="3">1802</text><circle class="pulse" cx="110" cy="49" r="2.5" fill="#75baff"/><rect x="0" y="0" width="160" height="160" fill="url(#lines)" pointer-events="none"/></g></svg>

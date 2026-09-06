@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="349" viewBox="0 0 960 349" role="img" aria-labelledby="title desc">
+<title id="title">Source language distribution</title><desc id="desc">Public original repository language byte distribution: TypeScript 66.8%, Python 29.1%, CSS 2.0%, SCSS 1.1%, HTML 0.8%, JavaScript 0.3%, Dockerfile 0.1%</desc>
+<defs><style>
+text{font-family:'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace}
+.pulse{animation:pulse 2.8s ease-in-out infinite}
+.cursor{animation:blink 1.2s step-end infinite}
+.orbit{transform-origin:80px 80px;animation:orbit 32s linear infinite}
+.scan{animation:scan 9s linear infinite}
+.boot{animation:boot 16s linear infinite;animation-delay:var(--delay,0s)}
+.meter{transform-box:fill-box;transform-origin:left;animation:meter 1.2s ease-out both}
+.rowlight{animation:rowlight 10s ease-in-out infinite;animation-delay:var(--delay,0s)}
+.tick{opacity:0;animation:tick 15s linear infinite;animation-delay:var(--delay,0s)}
+.tick.first{opacity:1}
+.hexlight{animation:hexlight 12s steps(7,end) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes scan{from{transform:translateY(-40px)}to{transform:translateY(440px)}}
+@keyframes boot{0%,3%{opacity:.16}8%,85%{opacity:1}92%,100%{opacity:.16}}
+@keyframes meter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rowlight{0%,8%,100%{opacity:0}15%,28%{opacity:.12}35%,95%{opacity:0}}
+@keyframes tick{0%,29%{opacity:1}33%,100%{opacity:0}}
+@keyframes hexlight{from{transform:translateY(0)}to{transform:translateY(196px)}}
+@media(prefers-reduced-motion:reduce){
+ .pulse,.cursor,.orbit,.scan,.boot,.meter,.rowlight,.tick,.hexlight{animation:none!important}
+ .scan,.rowlight,.hexlight{display:none}.tick{opacity:0}.tick.first{opacity:1}
+}
+</style>
+<pattern id="noise" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".45" fill="#75baff" opacity=".065"/></pattern>
+<pattern id="lines" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3H4" stroke="#000" opacity=".15"/></pattern>
+<linearGradient id="scan"><stop stop-color="#75baff" stop-opacity="0"/><stop offset=".5" stop-color="#75baff" stop-opacity=".09"/><stop offset="1" stop-color="#75baff" stop-opacity="0"/></linearGradient>
+<clipPath id="bounds"><rect width="960" height="349"/></clipPath></defs>
+<g clip-path="url(#bounds)"><rect x="0" y="0" width="960" height="349" fill="#080c12" /><rect x="0" y="0" width="960" height="349" fill="url(#noise)" /><rect x="0" y="0" width="960" height="36" fill="#0e1621" /><path d="M0 36H960" stroke="#253448" /><text x="16" y="24" font-size="13" fill="#75baff" >du --languages</text><text x="944" y="24" font-size="11" fill="#8b9fb8" text-anchor="end">SOURCE BYTES</text><text x="18" y="67" font-size="14" fill="#ecf3ff" >TypeScript</text><rect x="177" y="53" width="638" height="17" fill="#0e1621" /><rect x="177" y="53" width="425.93" height="17" fill="#75baff" class="meter"/><text x="942" y="67" font-size="13" fill="#75baff" text-anchor="end">66.8%</text><text x="18" y="104" font-size="14" fill="#ecf3ff" >Python</text><rect x="177" y="90" width="638" height="17" fill="#0e1621" /><rect x="177" y="90" width="185.34" height="17" fill="#a6d3ff" class="meter"/><text x="942" y="104" font-size="13" fill="#a6d3ff" text-anchor="end">29.1%</text><text x="18" y="141" font-size="14" fill="#ecf3ff" >CSS</text><rect x="177" y="127" width="638" height="17" fill="#0e1621" /><rect x="177" y="127" width="12.57" height="17" fill="#d8eaff" class="meter"/><text x="942" y="141" font-size="13" fill="#d8eaff" text-anchor="end">2.0%</text><text x="18" y="178" font-size="14" fill="#ecf3ff" >SCSS</text><rect x="177" y="164" width="638" height="17" fill="#0e1621" /><rect x="177" y="164" width="6.76" height="17" fill="#4e8ed8" class="meter"/><text x="942" y="178" font-size="13" fill="#4e8ed8" text-anchor="end">1.1%</text><text x="18" y="215" font-size="14" fill="#ecf3ff" >HTML</text><rect x="177" y="201" width="638" height="17" fill="#0e1621" /><rect x="177" y="201" width="5.04" height="17" fill="#a4c8eb" class="meter"/><text x="942" y="215" font-size="13" fill="#a4c8eb" text-anchor="end">0.8%</text><text x="18" y="252" font-size="14" fill="#ecf3ff" >JavaScript</text><rect x="177" y="238" width="638" height="17" fill="#0e1621" /><rect x="177" y="238" width="1.79" height="17" fill="#789dc4" class="meter"/><text x="942" y="252" font-size="13" fill="#789dc4" text-anchor="end">0.3%</text><text x="18" y="289" font-size="14" fill="#ecf3ff" >Dockerfile</text><rect x="177" y="275" width="638" height="17" fill="#0e1621" /><rect x="177" y="275" width="0.51" height="17" fill="#75baff" class="meter"/><text x="942" y="289" font-size="13" fill="#75baff" text-anchor="end">0.1%</text><path d="M0 320H960" stroke="#253448" /><text x="16" y="339" font-size="11" fill="#8b9fb8" >original repos / excluding forks</text><text x="944" y="339" font-size="11" fill="#8b9fb8" text-anchor="end">top source languages</text><rect x="0" y="0" width="960" height="349" fill="url(#lines)" pointer-events="none"/><rect x="0.5" y="0.5" width="959" height="348" fill="none" stroke="#253448"/></g></svg>

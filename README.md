@@ -1,54 +1,73 @@
+<div align="center">
+  <img src="./assets/mark.svg" width="120" height="120" alt="Luca microchip monogram" />
+</div>
+
 <picture>
-  <source media="(max-width: 600px)" srcset="./assets/terminal-mobile.svg" />
-  <img src="./assets/terminal.svg" width="100%" alt="Luca — building things, one commit at a time. Python, TypeScript, React, and command-line tools." />
+  <source media="(max-width: 600px)" srcset="./assets/hero-mobile.svg" />
+  <img src="./assets/hero.svg" width="960" alt="luca-1802. Software and automation. Python, TypeScript, React. Germany." />
 </picture>
 
-<p align="center">
-  <a href="https://github.com/luca-1802?tab=repositories"><code>explore repositories ↗</code></a>
-  &nbsp;·&nbsp;
-  <a href="https://github.com/luca-1802?tab=stars"><code>starred finds ↗</code></a>
-</p>
+## `./whoami`
 
-### `01` &nbsp; `~/about`
-
-I build tools for the web and the terminal — from a self-hosted password manager to small Python utilities that make everyday tasks easier.
-
-```typescript
-const luca = {
-  code: ["Python", "TypeScript"],
-  tools: ["React", "Docker", "Git"],
-  focus: "automation & CLI tools",
-};
+```text
+> Luca / Germany
+> software · automation · self-hosting
+> Python · TypeScript · React · Docker
 ```
 
-### `02` &nbsp; `~/projects`
+## `./stats`
 
-**[password-manager ↗](https://github.com/luca-1802/password-manager)**<br />
-A self-hosted vault with a web dashboard, browser extension, and CLI.<br />
-<sub><code>TypeScript</code> <code>React</code> <code>Python</code></sub>
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/stats-mobile.svg" />
+  <img src="./assets/stats.svg" width="960" alt="Public GitHub snapshot: stars, repositories, followers and source languages." />
+</picture>
 
-**[file-organizer ↗](https://github.com/luca-1802/file-organizer)**<br />
-Sort files into folders using configurable extension rules.<br />
-<sub><code>Python</code></sub>
+## `./now`
 
-**[weather-cli ↗](https://github.com/luca-1802/weather-cli)**<br />
-Current weather for any city, straight from the terminal.<br />
-<sub><code>Python</code> <code>OpenWeather</code></sub>
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/ticker-mobile.svg" />
+  <img src="./assets/ticker.svg" width="960" alt="Rotating project focus: password-manager, file-organizer and weather-cli." />
+</picture>
 
-### `03` &nbsp; `~/activity`
+## `./boot`
 
-<details>
-  <summary><code>$ github --stats</code> &nbsp; contributions, languages &amp; streaks</summary>
-  <br />
-  <p>
-    <img src="https://github-readme-xi-three.vercel.app/api?username=luca-1802&amp;show_icons=true&amp;hide_border=true&amp;count_private=true&amp;include_all_commits=true&amp;bg_color=10141b&amp;title_color=8ff0c8&amp;text_color=bac4d0&amp;icon_color=8ff0c8&amp;ring_color=8ff0c8&amp;border_radius=12" width="440" alt="Luca's GitHub contribution statistics" />
-    <img src="https://github-readme-xi-three.vercel.app/api/top-langs/?username=luca-1802&amp;layout=compact&amp;hide_border=true&amp;langs_count=8&amp;bg_color=10141b&amp;title_color=8ff0c8&amp;text_color=bac4d0&amp;border_radius=12" width="340" alt="Most used languages across Luca's repositories" />
-  </p>
-  <p>
-    <img src="https://streak-stats.demolab.com?user=luca-1802&amp;hide_border=true&amp;background=10141B&amp;ring=8FF0C8&amp;fire=8FF0C8&amp;currStreakNum=EDF3F8&amp;sideNums=EDF3F8&amp;currStreakLabel=8FF0C8&amp;sideLabels=BAC4D0&amp;dates=8B98A9&amp;stroke=283140&amp;border_radius=12" width="100%" alt="Luca's GitHub contribution streak" />
-  </p>
-</details>
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/boot-mobile.svg" />
+  <img src="./assets/boot.svg" width="960" alt="Decorative profile boot sequence introducing Python, TypeScript, React, Docker and Git." />
+</picture>
 
----
+## `./dump`
 
-<p align="center"><samp>read the source. make it yours. ship the next thing.</samp></p>
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/hexdump-mobile.svg" />
+  <img src="./assets/hexdump.svg" width="960" alt="Animated hexadecimal encoding of Luca's handle and toolkit." />
+</picture>
+
+## `./top`
+
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/repos-mobile.svg" />
+  <img src="./assets/repos.svg" width="960" alt="Original public repositories with language, stars, forks and last push." />
+</picture>
+
+[<samp>password-manager</samp>](https://github.com/luca-1802/password-manager) · [<samp>file-organizer</samp>](https://github.com/luca-1802/file-organizer) · [<samp>weather-cli</samp>](https://github.com/luca-1802/weather-cli)
+
+## `./lang`
+
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/languages-mobile.svg" />
+  <img src="./assets/languages.svg" width="960" alt="Language byte distribution across public original repositories." />
+</picture>
+
+## `./tail`
+
+<picture>
+  <source media="(max-width: 600px)" srcset="./assets/events-mobile.svg" />
+  <img src="./assets/events.svg" width="960" alt="Recent commits in public repositories, shown as a terminal log." />
+</picture>
+
+<div align="center">
+  <samp><a href="https://github.com/luca-1802?tab=repositories">repositories</a> / <a href="./assets/profile.txt">text view</a></samp>
+  <br /><br />
+  <sub><samp>session remains open _</samp></sub>
+</div>

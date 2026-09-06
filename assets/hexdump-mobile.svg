@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="296" viewBox="0 0 480 296" role="img" aria-labelledby="title desc">
+<title id="title">Profile hex dump</title><desc id="desc">A decorative hexadecimal encoding of luca-1802, Python, TypeScript, React, Docker, Git and CLI.</desc>
+<defs><style>
+text{font-family:'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace}
+.pulse{animation:pulse 2.8s ease-in-out infinite}
+.cursor{animation:blink 1.2s step-end infinite}
+.orbit{transform-origin:80px 80px;animation:orbit 32s linear infinite}
+.scan{animation:scan 9s linear infinite}
+.boot{animation:boot 16s linear infinite;animation-delay:var(--delay,0s)}
+.meter{transform-box:fill-box;transform-origin:left;animation:meter 1.2s ease-out both}
+.rowlight{animation:rowlight 10s ease-in-out infinite;animation-delay:var(--delay,0s)}
+.tick{opacity:0;animation:tick 15s linear infinite;animation-delay:var(--delay,0s)}
+.tick.first{opacity:1}
+.hexlight{animation:hexlight 12s steps(7,end) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes scan{from{transform:translateY(-40px)}to{transform:translateY(440px)}}
+@keyframes boot{0%,3%{opacity:.16}8%,85%{opacity:1}92%,100%{opacity:.16}}
+@keyframes meter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rowlight{0%,8%,100%{opacity:0}15%,28%{opacity:.12}35%,95%{opacity:0}}
+@keyframes tick{0%,29%{opacity:1}33%,100%{opacity:0}}
+@keyframes hexlight{from{transform:translateY(0)}to{transform:translateY(196px)}}
+@media(prefers-reduced-motion:reduce){
+ .pulse,.cursor,.orbit,.scan,.boot,.meter,.rowlight,.tick,.hexlight{animation:none!important}
+ .scan,.rowlight,.hexlight{display:none}.tick{opacity:0}.tick.first{opacity:1}
+}
+</style>
+<pattern id="noise" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".45" fill="#75baff" opacity=".065"/></pattern>
+<pattern id="lines" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3H4" stroke="#000" opacity=".15"/></pattern>
+<linearGradient id="scan"><stop stop-color="#75baff" stop-opacity="0"/><stop offset=".5" stop-color="#75baff" stop-opacity=".09"/><stop offset="1" stop-color="#75baff" stop-opacity="0"/></linearGradient>
+<clipPath id="bounds"><rect width="480" height="296"/></clipPath></defs>
+<g clip-path="url(#bounds)"><rect x="0" y="0" width="480" height="296" fill="#080c12" /><rect x="0" y="0" width="480" height="296" fill="url(#noise)" /><rect x="0" y="0" width="480" height="36" fill="#0e1621" /><path d="M0 36H480" stroke="#253448" /><text x="16" y="24" font-size="16" fill="#75baff" >hexdump -C profile.bin</text><rect x="10" y="52" width="460" height="27" fill="#75baff" class="hexlight" opacity=".07"/><text x="15" y="72" font-size="15" fill="#8b9fb8" >0000</text><text x="73" y="72" font-size="16" fill="#75baff" >6c 75 63 61 2d 31 38 30</text><text x="15" y="101" font-size="15" fill="#8b9fb8" >0008</text><text x="73" y="101" font-size="16" fill="#75baff" >32 00 50 79 74 68 6f 6e</text><text x="15" y="130" font-size="15" fill="#8b9fb8" >0010</text><text x="73" y="130" font-size="16" fill="#75baff" >00 54 79 70 65 53 63 72</text><text x="15" y="159" font-size="15" fill="#8b9fb8" >0018</text><text x="73" y="159" font-size="16" fill="#75baff" >69 70 74 00 52 65 61 63</text><text x="15" y="188" font-size="15" fill="#8b9fb8" >0020</text><text x="73" y="188" font-size="16" fill="#75baff" >74 00 44 6f 63 6b 65 72</text><text x="15" y="217" font-size="15" fill="#8b9fb8" >0028</text><text x="73" y="217" font-size="16" fill="#75baff" >00 47 69 74 00 43 4c 49</text><text x="15" y="246" font-size="15" fill="#8b9fb8" >0030</text><text x="73" y="246" font-size="16" fill="#75baff" >00</text><path d="M0 267H480" stroke="#253448" /><text x="16" y="286" font-size="12" fill="#8b9fb8" >ASCII / UTF-8</text><rect x="0" y="0" width="480" height="296" fill="url(#lines)" pointer-events="none"/><rect x="0.5" y="0.5" width="479" height="295" fill="none" stroke="#253448"/></g></svg>

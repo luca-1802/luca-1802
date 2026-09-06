@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="352" viewBox="0 0 480 352" role="img" aria-labelledby="title desc">
+<title id="title">luca-1802 / user space</title><desc id="desc">Luca in Germany. Software and automation. Python, TypeScript, React, Docker, Git and CLI tools. Animated profile terminal.</desc>
+<defs><style>
+text{font-family:'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace}
+.pulse{animation:pulse 2.8s ease-in-out infinite}
+.cursor{animation:blink 1.2s step-end infinite}
+.orbit{transform-origin:80px 80px;animation:orbit 32s linear infinite}
+.scan{animation:scan 9s linear infinite}
+.boot{animation:boot 16s linear infinite;animation-delay:var(--delay,0s)}
+.meter{transform-box:fill-box;transform-origin:left;animation:meter 1.2s ease-out both}
+.rowlight{animation:rowlight 10s ease-in-out infinite;animation-delay:var(--delay,0s)}
+.tick{opacity:0;animation:tick 15s linear infinite;animation-delay:var(--delay,0s)}
+.tick.first{opacity:1}
+.hexlight{animation:hexlight 12s steps(7,end) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes scan{from{transform:translateY(-40px)}to{transform:translateY(440px)}}
+@keyframes boot{0%,3%{opacity:.16}8%,85%{opacity:1}92%,100%{opacity:.16}}
+@keyframes meter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rowlight{0%,8%,100%{opacity:0}15%,28%{opacity:.12}35%,95%{opacity:0}}
+@keyframes tick{0%,29%{opacity:1}33%,100%{opacity:0}}
+@keyframes hexlight{from{transform:translateY(0)}to{transform:translateY(196px)}}
+@media(prefers-reduced-motion:reduce){
+ .pulse,.cursor,.orbit,.scan,.boot,.meter,.rowlight,.tick,.hexlight{animation:none!important}
+ .scan,.rowlight,.hexlight{display:none}.tick{opacity:0}.tick.first{opacity:1}
+}
+</style>
+<pattern id="noise" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".45" fill="#75baff" opacity=".065"/></pattern>
+<pattern id="lines" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3H4" stroke="#000" opacity=".15"/></pattern>
+<linearGradient id="scan"><stop stop-color="#75baff" stop-opacity="0"/><stop offset=".5" stop-color="#75baff" stop-opacity=".09"/><stop offset="1" stop-color="#75baff" stop-opacity="0"/></linearGradient>
+<clipPath id="bounds"><rect width="480" height="352"/></clipPath></defs>
+<g clip-path="url(#bounds)"><rect x="0" y="0" width="480" height="352" fill="#080c12" /><rect x="0" y="0" width="480" height="352" fill="url(#noise)" /><text x="28" y="29" font-size="12" fill="#75baff" letter-spacing="1.5">USER SPACE / PERSONAL SYSTEM</text><rect x="28" y="55" width="8" height="7" fill="#ecf3ff" /><rect x="28" y="64" width="8" height="7" fill="#d8eaff" /><rect x="28" y="73" width="8" height="7" fill="#a6d3ff" /><rect x="28" y="82" width="8" height="7" fill="#75baff" /><rect x="28" y="91" width="8" height="7" fill="#4e8ed8" /><rect x="28" y="100" width="8" height="7" fill="#253448" /><text x="54" y="101" font-size="48" fill="#ecf3ff" font-weight="700" letter-spacing="-2">luca-1802</text><path d="M54 116H443" stroke="#75baff" /><text x="28" y="153" font-size="14" fill="#8b9fb8" >FOCUS</text><text x="110" y="153" font-size="16" fill="#ecf3ff" >software / automation</text><text x="28" y="183" font-size="14" fill="#8b9fb8" >STACK</text><text x="110" y="183" font-size="16" fill="#ecf3ff" >Python · TypeScript · React</text><text x="28" y="213" font-size="14" fill="#8b9fb8" >BASE</text><text x="110" y="213" font-size="16" fill="#ecf3ff" >Germany</text><text x="28" y="243" font-size="14" fill="#8b9fb8" >TOOLS</text><text x="110" y="243" font-size="16" fill="#ecf3ff" >Docker · Git · CLI</text><text x="28" y="303" font-size="17" fill="#75baff" >&gt; ./luca --init</text><rect x="183" y="289" width="8" height="17" fill="#ecf3ff" class="cursor"/><text x="452" y="333" font-size="11" fill="#8b9fb8" text-anchor="end" letter-spacing="1">PUBLIC PROFILE</text><rect x="0" y="0" width="480" height="32" fill="url(#scan)" class="scan" pointer-events="none"/><rect x="0" y="0" width="480" height="352" fill="url(#lines)" pointer-events="none"/><rect x="0.5" y="0.5" width="479" height="351" fill="none" stroke="#253448"/></g></svg>

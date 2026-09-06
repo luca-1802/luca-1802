@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="276" viewBox="0 0 960 276" role="img" aria-labelledby="title desc">
+<title id="title">luca-1802 / user space</title><desc id="desc">Luca in Germany. Software and automation. Python, TypeScript, React, Docker, Git and CLI tools. Animated profile terminal.</desc>
+<defs><style>
+text{font-family:'IBM Plex Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace}
+.pulse{animation:pulse 2.8s ease-in-out infinite}
+.cursor{animation:blink 1.2s step-end infinite}
+.orbit{transform-origin:80px 80px;animation:orbit 32s linear infinite}
+.scan{animation:scan 9s linear infinite}
+.boot{animation:boot 16s linear infinite;animation-delay:var(--delay,0s)}
+.meter{transform-box:fill-box;transform-origin:left;animation:meter 1.2s ease-out both}
+.rowlight{animation:rowlight 10s ease-in-out infinite;animation-delay:var(--delay,0s)}
+.tick{opacity:0;animation:tick 15s linear infinite;animation-delay:var(--delay,0s)}
+.tick.first{opacity:1}
+.hexlight{animation:hexlight 12s steps(7,end) infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@keyframes scan{from{transform:translateY(-40px)}to{transform:translateY(440px)}}
+@keyframes boot{0%,3%{opacity:.16}8%,85%{opacity:1}92%,100%{opacity:.16}}
+@keyframes meter{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rowlight{0%,8%,100%{opacity:0}15%,28%{opacity:.12}35%,95%{opacity:0}}
+@keyframes tick{0%,29%{opacity:1}33%,100%{opacity:0}}
+@keyframes hexlight{from{transform:translateY(0)}to{transform:translateY(196px)}}
+@media(prefers-reduced-motion:reduce){
+ .pulse,.cursor,.orbit,.scan,.boot,.meter,.rowlight,.tick,.hexlight{animation:none!important}
+ .scan,.rowlight,.hexlight{display:none}.tick{opacity:0}.tick.first{opacity:1}
+}
+</style>
+<pattern id="noise" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".45" fill="#75baff" opacity=".065"/></pattern>
+<pattern id="lines" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3H4" stroke="#000" opacity=".15"/></pattern>
+<linearGradient id="scan"><stop stop-color="#75baff" stop-opacity="0"/><stop offset=".5" stop-color="#75baff" stop-opacity=".09"/><stop offset="1" stop-color="#75baff" stop-opacity="0"/></linearGradient>
+<clipPath id="bounds"><rect width="960" height="276"/></clipPath></defs>
+<g clip-path="url(#bounds)"><rect x="0" y="0" width="960" height="276" fill="#080c12" /><rect x="0" y="0" width="960" height="276" fill="url(#noise)" /><text x="28" y="29" font-size="12" fill="#75baff" letter-spacing="1.5">USER SPACE / PERSONAL SYSTEM</text><rect x="28" y="55" width="8" height="7" fill="#ecf3ff" /><rect x="28" y="64" width="8" height="7" fill="#d8eaff" /><rect x="28" y="73" width="8" height="7" fill="#a6d3ff" /><rect x="28" y="82" width="8" height="7" fill="#75baff" /><rect x="28" y="91" width="8" height="7" fill="#4e8ed8" /><rect x="28" y="100" width="8" height="7" fill="#253448" /><text x="54" y="101" font-size="61" fill="#ecf3ff" font-weight="700" letter-spacing="-2">luca-1802</text><path d="M54 116H555" stroke="#75baff" /><text x="54" y="153" font-size="12" fill="#8b9fb8" >FOCUS</text><text x="147" y="153" font-size="14" fill="#ecf3ff" >software / automation</text><text x="54" y="176" font-size="12" fill="#8b9fb8" >STACK</text><text x="147" y="176" font-size="14" fill="#ecf3ff" >Python · TypeScript · React</text><text x="54" y="199" font-size="12" fill="#8b9fb8" >BASE</text><text x="147" y="199" font-size="14" fill="#ecf3ff" >Germany</text><text x="54" y="222" font-size="12" fill="#8b9fb8" >TOOLS</text><text x="147" y="222" font-size="14" fill="#ecf3ff" >Docker · Git · CLI</text><text x="54" y="248" font-size="15" fill="#75baff" >&gt; ./luca --init</text><rect x="192" y="234" width="8" height="17" fill="#ecf3ff" class="cursor"/><rect x="641" y="54" width="291" height="190" fill="none" stroke="#253448"/><rect x="641" y="54" width="291" height="27" fill="#0e1621" /><text x="654" y="72" font-size="12" fill="#75baff" >session.info</text><text x="918" y="72" font-size="11" fill="#8b9fb8" text-anchor="end">0x1802</text><text x="654" y="102" font-size="12" fill="#8b9fb8" >user</text><text x="726" y="102" font-size="12" fill="#ecf3ff" >luca-1802</text><text x="654" y="125" font-size="12" fill="#8b9fb8" >repos</text><text x="726" y="125" font-size="12" fill="#ecf3ff" >05 public</text><text x="654" y="148" font-size="12" fill="#8b9fb8" >branch</text><text x="726" y="148" font-size="12" fill="#ecf3ff" >main</text><text x="654" y="171" font-size="12" fill="#8b9fb8" >created</text><text x="726" y="171" font-size="12" fill="#ecf3ff" >2022</text><text x="654" y="194" font-size="12" fill="#8b9fb8" >mode</text><text x="726" y="194" font-size="12" fill="#ecf3ff" >read / build / repeat</text><text x="654" y="217" font-size="12" fill="#8b9fb8" >refresh</text><text x="726" y="217" font-size="12" fill="#ecf3ff" >daily</text><rect x="0" y="0" width="960" height="32" fill="url(#scan)" class="scan" pointer-events="none"/><rect x="0" y="0" width="960" height="276" fill="url(#lines)" pointer-events="none"/><rect x="0.5" y="0.5" width="959" height="275" fill="none" stroke="#253448"/></g></svg>
