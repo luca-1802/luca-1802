@@ -227,7 +227,6 @@ def start_sheet(data, theme, mobile):
 <rect width="{width}" height="{height}" fill="{theme['background']}"/>
 <path d="M{edge} {edge}H{width-edge}V{height-edge}H{edge}Z" fill="{theme['paper']}" stroke="{theme['rule']}"/>
 <path d="M{margin} {edge}V{height-edge}" class="rule" stroke-dasharray="2 5"/>
-<rect x="{edge}" y="{edge}" width="{6 if mobile else 8}" height="86" fill="{theme['blue']}"/>
 <g fill="{theme['background']}" stroke="{theme['rule']}" stroke-width="1" aria-hidden="true">
 '''
     for y in range(139, height - 40, 228):

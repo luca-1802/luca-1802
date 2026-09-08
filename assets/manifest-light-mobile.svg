@@ -27,7 +27,6 @@
 <rect width="480" height="2260" fill="#f1f5fb"/>
 <path d="M10 10H470V2250H10Z" fill="#fdfefe" stroke="#d8e0ec"/>
 <path d="M40 10V2250" class="rule" stroke-dasharray="2 5"/>
-<rect x="10" y="10" width="6" height="86" fill="#164ee6"/>
 <g fill="#f1f5fb" stroke="#d8e0ec" stroke-width="1" aria-hidden="true">
 <circle cx="24" cy="139" r="4"/>
 <circle cx="24" cy="367" r="4"/>
