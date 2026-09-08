@@ -1,4 +1,4 @@
-name: Refresh public profile
+name: Refresh profile
 
 on:
   workflow_dispatch:
@@ -41,6 +41,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python scripts/collect_public.py
+      - name: Collect account totals and streaks
+        run: python scripts/collect_activity.py
       - name: Render Manifest editions
         run: python scripts/render_profile.py
       - name: Commit updated assets

@@ -1,4 +1,4 @@
-"""Render the Manifest profile from a public GitHub snapshot, without network access."""
+"""Render the profile's light, dark and mobile SVGs from saved snapshots."""
 from __future__ import annotations
 
 import argparse
@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import re
+from textwrap import wrap
 from urllib.parse import quote
 import xml.etree.ElementTree as ET
 
@@ -135,6 +136,31 @@ def e(value):
     return escape(str(value), quote=True)
 
 
+def validate_activity(data):
+    if not isinstance(data, dict) or data.get('login') != LOGIN or type(data.get('schema_version')) is not int or data['schema_version'] != 1:
+        raise ValueError('Unexpected activity snapshot identity or schema')
+    timestamp(data.get('sampled_at'), 'activity sampled_at')
+    for group, fields in (
+        ('stats', ('total_commits', 'total_stars', 'total_prs', 'total_issues', 'contributed_repos')),
+        ('streak', ('total_contributions', 'current_days', 'longest_days')),
+    ):
+        if not isinstance(data.get(group), dict):
+            raise ValueError(f'activity {group} must be an object')
+        for field in fields:
+            value = data[group].get(field)
+            natural(value, field)
+            if value > 2**63 - 1:
+                raise ValueError(f'{field} is too large')
+    if data['stats'].get('rank') not in ('S', 'A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'):
+        raise ValueError('Unexpected GitHub stats rank')
+    for field in ('contribution_range', 'current_range', 'longest_range'):
+        value = data['streak'].get(field)
+        text_value(value, field)
+        if not value or len(value) > 60 or any(char in value for char in '\r\n\t'):
+            raise ValueError(f'{field} must be a short date label')
+    return data
+
+
 def short(value, limit):
     value = ' '.join(str(value or '').split())
     return value if len(value) <= limit else value[:limit - 1] + '…'
@@ -147,6 +173,19 @@ def txt(x, y, value, classes='mono ink', size=None, extra=''):
 
 def rule(x, y, right, theme, strong=False):
     return f'<path d="M{x} {y}H{right}" stroke="{theme["strong" if strong else "rule"]}" stroke-width="{1.5 if strong else 1}"/>\n'
+
+
+def metric(x, y, value, label, *, width, size=48, accent=False, note=''):
+    value = str(value)
+    size = round(min(size, width / max(len(value), 1) / .62), 2)
+    parts = [txt(x, y, value, 'mono blue' if accent else 'mono ink', size,
+                 'font-weight="600" letter-spacing="-2"'),
+             txt(x, y + 32, label, 'mono label muted')]
+    if note:
+        lines = wrap(note, width=int(width / (13 * .62)), max_lines=2, placeholder='…')
+        parts.extend(txt(x, y + 61 + index * 17, line, 'mono muted', 13)
+                     for index, line in enumerate(lines))
+    return ''.join(parts)
 
 
 def selected_projects(data):
@@ -184,8 +223,10 @@ def recent_commits(data):
     return sorted(data['commits'], key=lambda r: (r['created_at'], r['repo'].casefold(), r['sha']), reverse=True)[:3]
 
 
-def start_sheet(data, theme, mobile):
+def start_sheet(data, theme, mobile, activity=None):
     width, height = (480, 2260) if mobile else (900, 1600)
+    if activity is not None:
+        height += 794 if mobile else 494
     edge, margin, hole_x = (10, 40, 24) if mobile else (18, 62, 39)
     bx, by = (276, 152) if mobile else (658, 131)
     stars = sum(r['stars'] for r in data['repos'] if not r['is_fork'])
@@ -198,6 +239,15 @@ def start_sheet(data, theme, mobile):
             'Public commit references are a bounded default-branch sample, not total contributions. '
             'Full details and links are in the accompanying profile.txt. '
             'The decorative barcode is the only animation and respects reduced motion.')
+    if activity is not None:
+        stats, streak = activity['stats'], activity['streak']
+        desc += (f" Account totals sampled {activity['sampled_at']}: "
+                 f"{stats['total_commits']} total commits, {stats['total_prs']} pull requests, "
+                 f"{stats['total_issues']} issues, {stats['total_stars']} stars earned, "
+                 f"{stats['contributed_repos']} repositories contributed to in the past year, rank {stats['rank']}. "
+                 f"{streak['total_contributions']} total contributions, current streak {streak['current_days']} days, "
+                 f"longest streak {streak['longest_days']} days. "
+                 'Account totals can include private activity. Contributions include more than commits.')
     out = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title description">
 <title id="title">Luca — Public software manifest</title>
 <desc id="description">{e(desc)}</desc>
@@ -279,10 +329,7 @@ def counts(data, theme, mobile):
     for n, (value, label) in enumerate(zip(values, labels)):
         x = 62 + n % 2 * 202 if mobile else 94 + n * 188
         y = 488 + n // 2 * 96 if mobile else 413
-        rendered = str(value).zfill(2)
-        size = min(48, (165 if mobile else 155) / max(len(rendered), 1) / .62)
-        out += txt(x, y, rendered, 'mono ink', round(size, 2), 'font-weight="600" letter-spacing="-2"')
-        out += txt(x, y + (32 if mobile else 30), label, 'mono label muted')
+        out += metric(x, y, f'{value:02}', label, width=165 if mobile else 155)
     out += '<path d="M252 461V621M62 546H442" class="rule"/>\n' if mobile else '<path d="M257 378V448M445 378V448M633 378V448" class="rule"/>\n'
     return out + rule(62 if mobile else 94, 648 if mobile else 475, 442 if mobile else 824, theme)
 
@@ -368,7 +415,55 @@ def changelog(data, theme, mobile):
     return out + rule(62 if mobile else 94, 1961 if mobile else 1372, 442 if mobile else 824, theme, True)
 
 
-def footer(data, theme, mobile):
+def account_activity(activity, theme, mobile):
+    stats, streak = activity['stats'], activity['streak']
+    left, right = (62, 442) if mobile else (94, 824)
+    columns = (62, 264) if mobile else (94, 350, 606)
+    rows = (2066, 2182, 2298) if mobile else (1491, 1591)
+    cells = (
+        (f"{stats['total_commits']:,}", 'Total commits'),
+        (f"{stats['total_prs']:,}", 'Pull requests'),
+        (f"{stats['total_issues']:,}", 'Issues opened'),
+        (f"{stats['total_stars']:,}", 'Stars earned'),
+        (f"{stats['contributed_repos']:,}", 'Repos / past year'),
+        (stats['rank'], 'GitHub rank'),
+    )
+    parts = ['<g id="account-activity">',
+             section(6, 'ALL-TIME ACTIVITY', 2001 if mobile else 1412, mobile,
+                     '' if mobile else 'ACCOUNT TOTALS')]
+    for index, (value, label) in enumerate(cells):
+        x = columns[index % len(columns)]
+        y = rows[index // len(columns)]
+        parts.append(metric(x, y, value, label, width=174 if mobile else 216,
+                            accent=index == 0, size=58 if index == 0 else 48))
+    if mobile:
+        parts.append('<path d="M252 2034V2352M62 2128H442M62 2244H442" class="rule"/>\n')
+    else:
+        parts.append('<path d="M326 1450V1630M582 1450V1630M94 1540H824" class="rule"/>\n')
+    parts.append(rule(left, 2380 if mobile else 1656, right, theme))
+    parts.append(section(7, 'CONTRIBUTION HISTORY', 2420 if mobile else 1696, mobile))
+    entries = (
+        (streak['total_contributions'], 'Contributions', streak['contribution_range']),
+        (streak['current_days'], 'Current streak', streak['current_range']),
+        (streak['longest_days'], 'Longest streak', streak['longest_range']),
+    )
+    for index, (value, label, date_range) in enumerate(entries):
+        if mobile:
+            x, y = (62, 2485) if index == 0 else (columns[index - 1], 2655)
+        else:
+            x, y = columns[index], 1764
+        parts.append(metric(x, y, f'{value:,}', label, width=174 if mobile and index else 216,
+                            accent=index == 0, note=date_range))
+    if mobile:
+        parts.append('<path d="M62 2580H442M252 2618V2734" class="rule"/>\n')
+    else:
+        parts.append('<path d="M326 1730V1838M582 1730V1838" class="rule"/>\n')
+    parts.append(rule(left, 2755 if mobile else 1866, right, theme, True))
+    parts.append('</g>\n')
+    return ''.join(parts)
+
+
+def footer(data, theme, mobile, offset=0, activity=None):
     x, rx = (62, 442) if mobile else (94, 824)
     out = txt(x, 2001 if mobile else 1409, 'DOCUMENT NOTE', 'mono meta blue', extra='font-weight="700"')
     if mobile:
@@ -376,26 +471,37 @@ def footer(data, theme, mobile):
         out += txt(x, 2069, 'as a software artifact.', 'sans ink', 20)
     else:
         out += txt(x, 1443, 'A public profile, rendered as a software artifact.', 'sans ink', 20)
-    out += txt(x, 2110 if mobile else 1475, 'Public snapshot · refreshed daily.', 'mono label muted')
+    out += txt(x, 2110 if mobile else 1475, 'Snapshots refreshed daily.' if activity else 'Public snapshot · refreshed daily.', 'mono label muted')
     out += rule(x, 2150 if mobile else 1513, rx, theme)
     out += txt(x, 2190 if mobile else 1541, 'github.com/' + data['login'], 'mono ink' if mobile else 'mono meta ink', 16 if mobile else None)
     out += txt(rx, 2224 if mobile else 1541, 'END OF MANIFEST', 'mono meta muted', extra='text-anchor="end"')
-    path = 'M450 30H460V40M460 2220V2230H450' if mobile else 'M844 38H862V56M862 1544V1562H844'
-    return out + f'<path d="{path}" stroke="{theme["blue"]}" stroke-width="1" fill="none"/>\n'
+    path = (f'M450 30H460V40M460 {2220 + offset}V{2230 + offset}H450' if mobile
+            else f'M844 38H862V56M862 {1544 + offset}V{1562 + offset}H844')
+    return (f'<g transform="translate(0 {offset})">\n{out}</g>\n'
+            f'<path d="{path}" stroke="{theme["blue"]}" stroke-width="1" fill="none"/>\n')
 
 
-def manifest(data, theme='light', mobile=False):
+def manifest(data, theme='light', mobile=False, activity=None):
     validate_snapshot(data)
+    if activity is not None:
+        validate_activity(activity)
     if theme not in THEMES:
         raise ValueError('Unknown Manifest theme')
     palette = THEMES[theme]
-    out = start_sheet(data, palette, mobile) + identity(data, palette, mobile)
-    for fn in (counts, inventory, composition):
-        out += fn(data, palette, mobile)
-    return out + toolchain(palette, mobile) + changelog(data, palette, mobile) + footer(data, palette, mobile) + '</svg>\n'
+    parts = [start_sheet(data, palette, mobile, activity), identity(data, palette, mobile),
+             counts(data, palette, mobile), inventory(data, palette, mobile),
+             composition(data, palette, mobile), toolchain(palette, mobile),
+             changelog(data, palette, mobile)]
+    offset = 0
+    if activity is not None:
+        parts.append(account_activity(activity, palette, mobile))
+        offset = 794 if mobile else 494
+    parts.append(footer(data, palette, mobile, offset, activity))
+    parts.append('</svg>\n')
+    return ''.join(parts)
 
 
-def transcript(data):
+def transcript(data, activity=None):
     validate_snapshot(data)
     profile = data['profile']
     parts = ['LUCA-1802 / PUBLIC SOFTWARE MANIFEST', 'Sampled ' + data['sampled_at'],
@@ -428,23 +534,41 @@ def transcript(data):
     parts += ['', '30-DAY PUBLIC EVENT SAMPLE / NOT TOTAL CONTRIBUTIONS',
               'Sample of up to 300 public feed events, filtered to owned public repositories; recent-event details retain up to 12 entries.']
     parts += [f"{row['date']}: {row['count']}" for row in data['activity']]
+    if activity is not None:
+        validate_activity(activity)
+        stats, streak = activity['stats'], activity['streak']
+        parts += ['', 'ACCOUNT ACTIVITY', 'Sampled ' + activity['sampled_at'],
+                  'Account totals can include private activity; they differ from the owned public repository counts above.',
+                  f"Total commits (all time): {stats['total_commits']}",
+                  f"Pull requests: {stats['total_prs']}", f"Issues opened: {stats['total_issues']}",
+                  f"Stars earned: {stats['total_stars']}",
+                  f"Repositories contributed to (past year): {stats['contributed_repos']}",
+                  f"GitHub stats rank: {stats['rank']}",
+                  f"Total contributions: {streak['total_contributions']} | {streak['contribution_range']}",
+                  f"Current streak: {streak['current_days']} days | {streak['current_range']}",
+                  f"Longest streak: {streak['longest_days']} days | {streak['longest_range']}",
+                  'Contributions include more than commits.',
+                  'Totals source: github-readme-xi-three.vercel.app (include_all_commits=true).',
+                  'Contribution and streak source: streak-stats.demolab.com.']
     return '\n'.join(parts) + '\n'
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--data', type=Path, default=ROOT / 'assets/profile-data.json')
+    parser.add_argument('--activity-data', type=Path, default=ROOT / 'assets/activity-data.json')
     parser.add_argument('--output-dir', type=Path, default=ROOT / 'assets')
     args = parser.parse_args(argv)
     try:
         data = validate_snapshot(json.loads(args.data.read_text(encoding='utf-8')))
+        activity = validate_activity(json.loads(args.activity_data.read_text(encoding='utf-8')))
         assets = {}
         for theme in THEMES:
             for mobile in (False, True):
                 name = f'manifest-{theme}{"-mobile" if mobile else ""}.svg'
-                assets[name] = manifest(data, theme, mobile)
+                assets[name] = manifest(data, theme, mobile, activity)
                 ET.fromstring(assets[name])
-        assets['profile.txt'] = transcript(data)
+        assets['profile.txt'] = transcript(data, activity)
         args.output_dir.mkdir(parents=True, exist_ok=True)
         for name, content in assets.items():
             (args.output_dir / name).write_text(content, encoding='utf-8', newline='\n')

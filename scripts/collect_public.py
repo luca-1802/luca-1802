@@ -108,9 +108,9 @@ def text(value, limit: int, fallback: str = "") -> str:
         return fallback
     if not isinstance(value, str):
         raise CollectionError("GitHub returned an invalid text field; snapshot was not updated.")
-    # Strip control characters and collapse whitespace. SVG/XML escaping belongs
-    # to the renderer, so preserve ordinary text such as ampersands here.
-    return " ".join("".join(char for char in value if char.isprintable() or char.isspace()).split())[:limit]
+    # Keep ordinary text intact; the renderer handles XML escaping.
+    printable = "".join(char for char in value if char.isprintable() or char.isspace())
+    return " ".join(printable.split())[:limit]
 
 
 def natural(value, field: str) -> int:
@@ -197,7 +197,12 @@ def event_url(raw: dict, repo_url: str) -> str:
         number = issue.get("number") if isinstance(issue, dict) else None
         if type(number) is int and 0 < number <= 2**31 - 1:
             return f"{repo_url}/issues/{number}"
-    if kind in {"PullRequestEvent", "PullRequestReviewEvent", "PullRequestReviewCommentEvent", "PullRequestReviewThreadEvent"}:
+    if kind in {
+        "PullRequestEvent",
+        "PullRequestReviewEvent",
+        "PullRequestReviewCommentEvent",
+        "PullRequestReviewThreadEvent",
+    }:
         pull = payload.get("pull_request")
         number = pull.get("number") if isinstance(pull, dict) else payload.get("number")
         if type(number) is int and 0 < number <= 2**31 - 1:
@@ -241,8 +246,7 @@ def commit_records(client: GitHubClient, login: str, repos: list[dict]) -> list[
         try:
             raw_commits = client.get(f"/repos/{login}/{repo['name']}/commits", per_page=3)
         except GitHubHTTPError as error:
-            # GitHub returns 409 for an empty repository. Other failures abort
-            # the whole snapshot so a missing source is never silently hidden.
+            # An empty repository has no commits and returns HTTP 409.
             if error.status_code == 409:
                 continue
             raise
@@ -274,29 +278,41 @@ def commit_records(client: GitHubClient, login: str, repos: list[dict]) -> list[
                 "message": f"commit {sha[:7]}",
                 "url": f"{repo['url']}/commit/{sha}",
             })
-    return sorted(commits, key=lambda commit: (commit["created_at"], commit["repo"].casefold(), commit["sha"]), reverse=True)[:8]
+    commits.sort(
+        key=lambda commit: (commit["created_at"], commit["repo"].casefold(), commit["sha"]),
+        reverse=True,
+    )
+    return commits[:8]
 
 
-def collect(client: GitHubClient, login: str = "luca-1802", now: datetime | None = None) -> dict:
-    login = validate_login(login)
-    now = now or datetime.now(timezone.utc)
-    if now.tzinfo is None:
-        raise CollectionError("The sampling time must have an explicit timezone.")
-    now = now.astimezone(timezone.utc)
-    sampled_at = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+def collect_profile(client: GitHubClient, login: str) -> dict:
     user = client.get(f"/users/{login}")
-    if not isinstance(user, dict) or not isinstance(user.get("login"), str) or user["login"].casefold() != login.casefold():
+    if (
+        not isinstance(user, dict)
+        or not isinstance(user.get("login"), str)
+        or user["login"].casefold() != login.casefold()
+    ):
         raise CollectionError("GitHub returned an unexpected account; snapshot was not updated.")
-    profile = {
+    return {
         "name": text(user.get("name"), 80) or login,
         "followers": natural(user.get("followers"), "follower count"),
         "following": natural(user.get("following"), "following count"),
         "created_at": timestamp(user.get("created_at"), "account creation timestamp"),
         "public_repos": natural(user.get("public_repos"), "public repository count"),
     }
+
+
+def collect_repositories(client: GitHubClient, login: str) -> list[dict]:
     repos_by_name = {}
     for page in range(1, MAX_REPO_PAGES + 1):
-        raw_repos = client.get(f"/users/{login}/repos", type="owner", sort="full_name", direction="asc", per_page=PER_PAGE, page=page)
+        raw_repos = client.get(
+            f"/users/{login}/repos",
+            type="owner",
+            sort="full_name",
+            direction="asc",
+            per_page=PER_PAGE,
+            page=page,
+        )
         if not isinstance(raw_repos, list) or len(raw_repos) > PER_PAGE:
             raise CollectionError("GitHub returned an invalid repository page.")
         for raw in raw_repos:
@@ -306,8 +322,17 @@ def collect(client: GitHubClient, login: str = "luca-1802", now: datetime | None
         if len(raw_repos) < PER_PAGE:
             break
     else:
-        raise CollectionError(f"Repository pagination reached {MAX_REPO_PAGES} full pages; increase the explicit limit before retrying.")
-    repos = sorted(repos_by_name.values(), key=lambda repo: (repo["is_fork"], -repo["stars"], repo["name"].casefold()))
+        raise CollectionError(
+            f"Repository pagination reached {MAX_REPO_PAGES} full pages; "
+            "increase the explicit limit before retrying."
+        )
+    return sorted(
+        repos_by_name.values(),
+        key=lambda repo: (repo["is_fork"], -repo["stars"], repo["name"].casefold()),
+    )
+
+
+def collect_languages(client: GitHubClient, login: str, repos: list[dict]) -> list[dict]:
     language_bytes = Counter()
     for repo in repos:
         if repo["is_fork"] or repo["name"].casefold() == login.casefold():
@@ -321,11 +346,19 @@ def collect(client: GitHubClient, login: str = "luca-1802", now: datetime | None
                 raise CollectionError("GitHub returned an empty language name.")
             language_bytes[language] += natural(size, "language byte count")
     total_bytes = sum(language_bytes.values())
-    languages = [
-        {"name": name, "bytes": size, "percentage": round(100 * size / total_bytes, 2) if total_bytes else 0.0}
+    return [
+        {
+            "name": name,
+            "bytes": size,
+            "percentage": round(100 * size / total_bytes, 2) if total_bytes else 0.0,
+        }
         for name, size in sorted(language_bytes.items(), key=lambda item: (-item[1], item[0].casefold()))
     ]
-    commits = commit_records(client, login, repos)
+
+
+def collect_events(
+    client: GitHubClient, login: str, repos: list[dict], sampled_at: str
+) -> list[dict]:
     allowed = {f"{login}/{repo['name']}".casefold(): repo for repo in repos}
     events = []
     seen_event_ids = set()
@@ -347,11 +380,32 @@ def collect(client: GitHubClient, login: str = "luca-1802", now: datetime | None
         if len(raw_events) < PER_PAGE:
             break
     events.sort(key=lambda event: event["created_at"], reverse=True)
+    return events
+
+
+def daily_activity(events: list[dict], now: datetime) -> list[dict]:
     daily_counts = Counter(event["created_at"][:10] for event in events)
-    activity = [
-        {"date": (now.date() - timedelta(days=offset)).isoformat(), "count": daily_counts[(now.date() - timedelta(days=offset)).isoformat()]}
-        for offset in range(29, -1, -1)
-    ]
+    activity = []
+    for offset in range(29, -1, -1):
+        day = (now.date() - timedelta(days=offset)).isoformat()
+        activity.append({"date": day, "count": daily_counts[day]})
+    return activity
+
+
+def collect(client: GitHubClient, login: str = "luca-1802", now: datetime | None = None) -> dict:
+    login = validate_login(login)
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise CollectionError("The sampling time must have an explicit timezone.")
+    now = now.astimezone(timezone.utc)
+    sampled_at = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    profile = collect_profile(client, login)
+    repos = collect_repositories(client, login)
+    languages = collect_languages(client, login, repos)
+    commits = commit_records(client, login, repos)
+    events = collect_events(client, login, repos, sampled_at)
+
     return {
         "schema_version": 1,
         "login": login,
@@ -361,7 +415,7 @@ def collect(client: GitHubClient, login: str = "luca-1802", now: datetime | None
         "languages": languages,
         "commits": commits,
         "events": events[:12],
-        "activity": activity,
+        "activity": daily_activity(events, now),
     }
 
 
@@ -371,7 +425,15 @@ def write_snapshot(data: dict, output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
     try:
-        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="\n", prefix=f".{output.name}.", suffix=".tmp", dir=output.parent, delete=False) as handle:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            newline="\n",
+            prefix=f".{output.name}.",
+            suffix=".tmp",
+            dir=output.parent,
+            delete=False,
+        ) as handle:
             temporary = Path(handle.name)
             handle.write(serialized)
             handle.flush()
@@ -397,7 +459,10 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError):
         print("Profile snapshot could not be written; check the output path and permissions.", file=sys.stderr)
         return 1
-    print(f"Collected {len(data['repos'])} public owned repositories, {len(data['commits'])} sampled commits, and {len(data['events'])} recent events.")
+    print(
+        f"Collected {len(data['repos'])} public owned repositories, "
+        f"{len(data['commits'])} sampled commits, and {len(data['events'])} recent events."
+    )
     return 0
 
 

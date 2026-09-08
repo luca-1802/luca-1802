@@ -27,6 +27,15 @@ def data():
             'repos': [], 'languages': [], 'commits': [], 'events': [], 'activity': []}
 
 
+def activity_data():
+    return {'schema_version': 1, 'login': 'luca-1802', 'sampled_at': '2026-09-08T12:00:00Z',
+            'stats': {'total_commits': 965, 'total_stars': 5, 'total_prs': 64,
+                      'total_issues': 79, 'contributed_repos': 5, 'rank': 'B'},
+            'streak': {'total_contributions': 1148, 'current_days': 5, 'longest_days': 13,
+                       'contribution_range': 'Oct 20, 2022 - Present',
+                       'current_range': 'Sep 4 - Sep 8', 'longest_range': 'Mar 2 - Mar 14'}}
+
+
 def repo(name, *, fork=False, stars=0, language='Python', description=''):
     return {'name': name, 'url': 'https://github.com/luca-1802/' + quote(name, safe='-._~'),
             'stars': stars, 'forks': 0, 'language': language, 'description': description,
@@ -49,6 +58,59 @@ def visible_text(root):
 
 
 class ManifestTests(unittest.TestCase):
+    def test_account_totals_are_part_of_every_manifest_edition(self):
+        for mobile in (False, True):
+            editions = []
+            for theme in ('light', 'dark'):
+                root = ET.fromstring(renderer.manifest(data(), theme, mobile, activity_data()))
+                editions.append(visible_text(root))
+                self.assertEqual(root.attrib['height'], '3054' if mobile else '2094')
+                section = root.find(f'.//{SVG}g[@id="account-activity"]')
+                self.assertIsNotNone(section)
+                texts = visible_text(section)
+                for value in ('ALL-TIME ACTIVITY', 'CONTRIBUTION HISTORY', '965', '64', '79',
+                              'B', '1,148', '13', 'Total commits', 'Current streak', 'Longest streak'):
+                    self.assertIn(value, texts)
+                description = root.find(SVG + 'desc').text
+                self.assertIn('965 total commits', description)
+                self.assertIn('Account totals can include private activity', description)
+                self.assertIsNone(root.find('.//' + SVG + 'image'))
+                self.assertFalse(any(node.get('height') == '86' and node.get('x') in ('10', '18')
+                                     for node in root.iter()))
+            self.assertEqual(editions[0], editions[1])
+        transcript = renderer.transcript(data(), activity_data())
+        self.assertIn('Total commits (all time): 965', transcript)
+        self.assertIn('Total contributions: 1148 | Oct 20, 2022 - Present', transcript)
+        self.assertIn('Current streak: 5 days | Sep 4 - Sep 8', transcript)
+
+    def test_activity_rejects_invalid_counts_identity_and_dates(self):
+        for path, invalid in [('schema_version', True), ('login', 'someone-else'),
+                              ('sampled_at', 'not-a-date'), ('stats.total_commits', True),
+                              ('stats.total_commits', -1), ('stats.total_stars', 2**63),
+                              ('stats.rank', 'invented'), ('streak.current_days', 1.5),
+                              ('streak.current_range', None), ('streak.current_range', 'A\nB')]:
+            with self.subTest(path=path):
+                snapshot = activity_data()
+                keys = path.split('.')
+                target = snapshot if len(keys) == 1 else snapshot[keys[0]]
+                target[keys[-1]] = invalid
+                with self.assertRaises(ValueError):
+                    renderer.manifest(data(), activity=snapshot)
+
+    def test_long_streak_dates_wrap_and_zero_counts_are_displayed(self):
+        snapshot = activity_data()
+        snapshot['streak'].update(current_days=0, current_range='Sep 8', longest_days=366,
+                                  longest_range='Dec 31, 2024 - Dec 31, 2025')
+        snapshot['stats']['total_commits'] = 123456789012345
+        for mobile in (False, True):
+            root = ET.fromstring(renderer.manifest(data(), mobile=mobile, activity=snapshot))
+            section = root.find(f'.//{SVG}g[@id="account-activity"]')
+            texts = visible_text(section)
+            self.assertIn('0', texts)
+            self.assertIn('123,456,789,012,345', texts)
+            self.assertNotIn('Dec 31, 2024 - Dec 31, 2025', texts)
+            self.assertIn('Dec 31, 2024 - Dec 31, 2025', renderer.transcript(data(), snapshot))
+
     def test_empty_snapshot_has_truthful_readable_states_in_every_variant(self):
         for theme in ('light', 'dark'):
             for mobile in (False, True):
@@ -258,8 +320,11 @@ class ManifestTests(unittest.TestCase):
             temp = Path(directory)
             snapshot_file = temp / 'snapshot.json'
             snapshot_file.write_text(json.dumps(data()), encoding='utf-8')
+            activity_file = temp / 'activity.json'
+            activity_file.write_text(json.dumps(activity_data()), encoding='utf-8')
             output = temp / 'rendered'
-            command = [sys.executable, str(SCRIPT), '--data', str(snapshot_file), '--output-dir', str(output)]
+            command = [sys.executable, str(SCRIPT), '--data', str(snapshot_file),
+                       '--activity-data', str(activity_file), '--output-dir', str(output)]
             result = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
             expected = {'manifest-light.svg', 'manifest-dark.svg', 'manifest-light-mobile.svg', 'manifest-dark-mobile.svg', 'profile.txt'}
@@ -275,6 +340,11 @@ class ManifestTests(unittest.TestCase):
                 self.assertIn('Manifest rendering failed:', result.stderr)
                 self.assertNotIn('Traceback', result.stderr)
                 self.assertEqual({p.name: p.read_bytes() for p in output.iterdir()}, original)
+            snapshot_file.write_text(json.dumps(data()), encoding='utf-8')
+            activity_file.write_text(json.dumps({'schema_version': 1}), encoding='utf-8')
+            result = subprocess.run(command, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual({p.name: p.read_bytes() for p in output.iterdir()}, original)
 
 
 if __name__ == '__main__':
