@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="480" height="2260" viewBox="0 0 480 2260" role="img" aria-labelledby="title description">
 <title id="title">Luca — Public software manifest</title>
-<desc id="description">Luca, luca-1802, Germany. Software and automation. 5 public repositories, 2 stars on original repositories, 6 followers, 7 source languages. Public snapshot sampled 2026-09-07T13:30:44Z. Selected projects: password-manager, file-organizer, weather-cli. Language shares use bytes from original repositories, excluding the profile repository. Public commit references are a bounded default-branch sample, not total contributions. Full details and links are in the accompanying profile.txt. The decorative barcode is the only animation and respects reduced motion.</desc>
+<desc id="description">Luca, luca-1802, Germany. Software and automation. 5 public repositories, 2 stars on original repositories, 6 followers, 7 source languages. Public snapshot sampled 2026-09-08T09:24:29Z. Selected projects: password-manager, file-organizer, weather-cli. Language shares use bytes from original repositories, excluding the profile repository. Public commit references are a bounded default-branch sample, not total contributions. Full details and links are in the accompanying profile.txt. The decorative barcode is the only animation and respects reduced motion.</desc>
 <defs>
   <pattern id="registration-grid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="#164ee6" stroke-width="0.6" opacity="0.08"/></pattern>
   <clipPath id="barcode-clip"><rect x="276" y="152" width="166" height="62"/></clipPath>
@@ -40,7 +40,7 @@
 <circle cx="24" cy="2191" r="4"/>
 </g>
 <text x="62" y="48" class="mono meta blue" font-weight="700">MANIFEST</text>
-<text x="442" y="76" class="mono meta muted" text-anchor="end">SNAPSHOT · 2026-09-07</text>
+<text x="442" y="76" class="mono meta muted" text-anchor="end">SNAPSHOT · 2026-09-08</text>
 <path d="M62 98H442" stroke="#222b3a" stroke-width="1.5"/>
 <text x="62" y="130" class="mono meta muted" >PUBLIC SOFTWARE MANIFEST</text>
 <text x="58" y="205" class="sans ink" font-size="64" font-weight="650" letter-spacing="-2">Luca</text>
@@ -135,13 +135,13 @@
 <text x="27" y="1672" class="mono meta blue" transform="rotate(-90 27 1672)">05</text>
 <text x="62" y="1672" class="mono meta blue" font-weight="700">CHANGELOG EXCERPT</text>
 <text x="62" y="1704" class="mono label muted" >Public commit references</text>
-<text x="62" y="1743" class="mono blue" font-size="18" >70a4796</text>
+<text x="62" y="1743" class="mono blue" font-size="18" >2f25b8d</text>
 <text x="62" y="1771" class="mono ink" font-size="18" >luca-1802</text>
-<text x="442" y="1743" class="mono meta muted" text-anchor="end">2026-09-06</text>
-<text x="62" y="1821" class="mono blue" font-size="18" >fb3acc2</text>
+<text x="442" y="1743" class="mono meta muted" text-anchor="end">2026-09-08</text>
+<text x="62" y="1821" class="mono blue" font-size="18" >1b8eafe</text>
 <text x="62" y="1849" class="mono ink" font-size="18" >luca-1802</text>
-<text x="442" y="1821" class="mono meta muted" text-anchor="end">2026-09-06</text>
-<text x="62" y="1899" class="mono blue" font-size="18" >22b7850</text>
+<text x="442" y="1821" class="mono meta muted" text-anchor="end">2026-09-07</text>
+<text x="62" y="1899" class="mono blue" font-size="18" >70a4796</text>
 <text x="62" y="1927" class="mono ink" font-size="18" >luca-1802</text>
 <text x="442" y="1899" class="mono meta muted" text-anchor="end">2026-09-06</text>
 <path d="M62 1961H442" stroke="#222b3a" stroke-width="1.5"/>

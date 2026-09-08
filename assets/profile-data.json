@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "login": "luca-1802",
-  "sampled_at": "2026-09-07T13:30:44Z",
+  "sampled_at": "2026-09-08T09:24:29Z",
   "profile": {
     "name": "Luca",
     "followers": 6,
@@ -38,7 +38,7 @@
       "language": "Python",
       "description": "",
       "is_fork": false,
-      "pushed_at": "2026-09-06T15:33:06Z"
+      "pushed_at": "2026-09-08T09:24:20Z"
     },
     {
       "name": "weather-cli",
@@ -100,25 +100,25 @@
   ],
   "commits": [
     {
+      "sha": "2f25b8dc31ee9212a773b04a7301bdf8d2c365fe",
+      "created_at": "2026-09-08T09:24:13Z",
+      "repo": "luca-1802",
+      "message": "commit 2f25b8d",
+      "url": "https://github.com/luca-1802/luca-1802/commit/2f25b8dc31ee9212a773b04a7301bdf8d2c365fe"
+    },
+    {
+      "sha": "1b8eafea2d4421a42ba9e1f30282499caf7bd945",
+      "created_at": "2026-09-07T13:30:47Z",
+      "repo": "luca-1802",
+      "message": "commit 1b8eafe",
+      "url": "https://github.com/luca-1802/luca-1802/commit/1b8eafea2d4421a42ba9e1f30282499caf7bd945"
+    },
+    {
       "sha": "70a4796bff3bcd058ab3fc9ae02ab9dbc032b190",
       "created_at": "2026-09-06T15:33:06Z",
       "repo": "luca-1802",
       "message": "commit 70a4796",
       "url": "https://github.com/luca-1802/luca-1802/commit/70a4796bff3bcd058ab3fc9ae02ab9dbc032b190"
-    },
-    {
-      "sha": "fb3acc2abc698133c5e6504f2ff6d1e50caa33f0",
-      "created_at": "2026-09-06T15:32:55Z",
-      "repo": "luca-1802",
-      "message": "commit fb3acc2",
-      "url": "https://github.com/luca-1802/luca-1802/commit/fb3acc2abc698133c5e6504f2ff6d1e50caa33f0"
-    },
-    {
-      "sha": "22b7850029793b0d2f22cabb7dbd4ab02278a077",
-      "created_at": "2026-09-06T14:45:59Z",
-      "repo": "luca-1802",
-      "message": "commit 22b7850",
-      "url": "https://github.com/luca-1802/luca-1802/commit/22b7850029793b0d2f22cabb7dbd4ab02278a077"
     },
     {
       "sha": "b18ccc64c4d103f875522adc120e4f3af5e4dd15",
@@ -158,6 +158,13 @@
   ],
   "events": [
     {
+      "created_at": "2026-09-08T09:24:21Z",
+      "kind": "PushEvent",
+      "repo": "luca-1802",
+      "message": "Pushed commits",
+      "url": "https://github.com/luca-1802/luca-1802/commit/2f25b8dc31ee9212a773b04a7301bdf8d2c365fe"
+    },
+    {
       "created_at": "2026-09-06T15:32:57Z",
       "kind": "PushEvent",
       "repo": "luca-1802",
@@ -170,13 +177,16 @@
       "repo": "luca-1802",
       "message": "Pushed commits",
       "url": "https://github.com/luca-1802/luca-1802/commit/0126a4be73c7319b95ab652ea6241956c16c3a90"
+    },
+    {
+      "created_at": "2026-09-06T14:26:51Z",
+      "kind": "PushEvent",
+      "repo": "luca-1802",
+      "message": "Pushed commits",
+      "url": "https://github.com/luca-1802/luca-1802/commit/c4408652452b1524c30b91010f743b19b580ea38"
     }
   ],
   "activity": [
-    {
-      "date": "2026-08-09",
-      "count": 0
-    },
     {
       "date": "2026-08-10",
       "count": 0
@@ -287,11 +297,15 @@
     },
     {
       "date": "2026-09-06",
-      "count": 2
+      "count": 3
     },
     {
       "date": "2026-09-07",
       "count": 0
+    },
+    {
+      "date": "2026-09-08",
+      "count": 1
     }
   ]
 }
