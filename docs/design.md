@@ -8,7 +8,7 @@ The light edition uses cool white paper, graphite text, and cobalt annotations. 
 
 The barcode scan is the only animation and stops for `prefers-reduced-motion: reduce`. The image has no scripts, external images or fonts. The top-left accent strip is intentionally absent.
 
-Account totals and streaks use the same monospace numbers, margins and rules as the rest of the document. The README contains only the adaptive picture; it has no separate project-link block or activity heading. The SVG description and `assets/profile.txt` provide text equivalents. The picture URLs include a version query to replace the cached image from the previous layout; increment it when publishing another visual revision.
+Account totals and streaks use the same monospace numbers, margins and rules as the rest of the document. The README contains only the adaptive picture; it has no separate project-link block or activity heading. The SVG description and `assets/profile.txt` provide text equivalents. The SVG filenames end in `-v2.svg` to replace the cached image from the previous layout. GitHub strips query strings when redirecting relative image URLs to raw content, so visual revisions must update the filename suffix in the renderer, README and output-name test together.
 
 ## Data and refresh
 

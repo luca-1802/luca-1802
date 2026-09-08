@@ -565,7 +565,7 @@ def main(argv=None):
         assets = {}
         for theme in THEMES:
             for mobile in (False, True):
-                name = f'manifest-{theme}{"-mobile" if mobile else ""}.svg'
+                name = f'manifest-{theme}{"-mobile" if mobile else ""}-v2.svg'
                 assets[name] = manifest(data, theme, mobile, activity)
                 ET.fromstring(assets[name])
         assets['profile.txt'] = transcript(data, activity)

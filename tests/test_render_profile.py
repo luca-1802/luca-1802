@@ -327,7 +327,7 @@ class ManifestTests(unittest.TestCase):
                        '--activity-data', str(activity_file), '--output-dir', str(output)]
             result = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
-            expected = {'manifest-light.svg', 'manifest-dark.svg', 'manifest-light-mobile.svg', 'manifest-dark-mobile.svg', 'profile.txt'}
+            expected = {'manifest-light-v2.svg', 'manifest-dark-v2.svg', 'manifest-light-mobile-v2.svg', 'manifest-dark-mobile-v2.svg', 'profile.txt'}
             self.assertEqual({p.name for p in output.iterdir()}, expected)
             original = {p.name: p.read_bytes() for p in output.iterdir()}
             result = subprocess.run(command, capture_output=True, text=True)
