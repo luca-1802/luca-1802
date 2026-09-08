@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "login": "luca-1802",
-  "sampled_at": "2026-09-08T09:42:45Z",
+  "sampled_at": "2026-09-08T09:45:03Z",
   "profile": {
     "name": "Luca",
     "followers": 6,
@@ -38,7 +38,7 @@
       "language": "Python",
       "description": "",
       "is_fork": false,
-      "pushed_at": "2026-09-08T09:42:36Z"
+      "pushed_at": "2026-09-08T09:44:55Z"
     },
     {
       "name": "weather-cli",
@@ -100,25 +100,25 @@
   ],
   "commits": [
     {
+      "sha": "7f0f31600c994dc054bc49f1200ab32d658d4240",
+      "created_at": "2026-09-08T09:44:53Z",
+      "repo": "luca-1802",
+      "message": "commit 7f0f316",
+      "url": "https://github.com/luca-1802/luca-1802/commit/7f0f31600c994dc054bc49f1200ab32d658d4240"
+    },
+    {
+      "sha": "385870f998d41e4c5f75c02abdd2524db47f439a",
+      "created_at": "2026-09-08T09:42:49Z",
+      "repo": "luca-1802",
+      "message": "commit 385870f",
+      "url": "https://github.com/luca-1802/luca-1802/commit/385870f998d41e4c5f75c02abdd2524db47f439a"
+    },
+    {
       "sha": "fa66ca17cc242bee1f2b83651f30a0da395a686d",
       "created_at": "2026-09-08T09:42:34Z",
       "repo": "luca-1802",
       "message": "commit fa66ca1",
       "url": "https://github.com/luca-1802/luca-1802/commit/fa66ca17cc242bee1f2b83651f30a0da395a686d"
-    },
-    {
-      "sha": "5b7a3f76b124cbd938e35a4fdad9b348de4821c9",
-      "created_at": "2026-09-08T09:24:32Z",
-      "repo": "luca-1802",
-      "message": "commit 5b7a3f7",
-      "url": "https://github.com/luca-1802/luca-1802/commit/5b7a3f76b124cbd938e35a4fdad9b348de4821c9"
-    },
-    {
-      "sha": "2f25b8dc31ee9212a773b04a7301bdf8d2c365fe",
-      "created_at": "2026-09-08T09:24:13Z",
-      "repo": "luca-1802",
-      "message": "commit 2f25b8d",
-      "url": "https://github.com/luca-1802/luca-1802/commit/2f25b8dc31ee9212a773b04a7301bdf8d2c365fe"
     },
     {
       "sha": "b18ccc64c4d103f875522adc120e4f3af5e4dd15",
@@ -157,6 +157,13 @@
     }
   ],
   "events": [
+    {
+      "created_at": "2026-09-08T09:42:37Z",
+      "kind": "PushEvent",
+      "repo": "luca-1802",
+      "message": "Pushed commits",
+      "url": "https://github.com/luca-1802/luca-1802/commit/fa66ca17cc242bee1f2b83651f30a0da395a686d"
+    },
     {
       "created_at": "2026-09-08T09:24:21Z",
       "kind": "PushEvent",
@@ -305,7 +312,7 @@
     },
     {
       "date": "2026-09-08",
-      "count": 1
+      "count": 2
     }
   ]
 }
