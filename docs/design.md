@@ -34,7 +34,7 @@ python -m unittest discover -s tests -v
 
 Account totals still come from the original `github-readme-xi-three.vercel.app` deployment with `include_all_commits=true` and the existing `count_private=true` option. Coverage depends on that deployment's GitHub token and GitHub's index, so these totals can include private activity and differ from the owned public repository counts. Contribution totals, daily streaks and date ranges come from `streak-stats.demolab.com`; contributions include more than commits.
 
-The activity collector saves only validated numbers, rank and date labels. It does not pass a token to either service or embed their SVGs. A failed collection leaves the saved snapshot intact and stops the workflow before it publishes assets. Service caches can still delay changes to the numbers.
+The activity collector saves only validated numbers, rank and date labels. It does not pass a token to either service or embed their SVGs. It retries temporary service failures twice. If all attempts fail, the last valid activity snapshot and its original sample time remain intact; the workflow reports a warning and still publishes refreshed public data. Rendering fails if that retained snapshot is missing or invalid. Service caches can still delay changes to the numbers.
 
 ## Python structure
 

@@ -16,6 +16,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+import time
 from urllib.error import HTTPError, URLError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 import xml.etree.ElementTree as ET
@@ -200,6 +201,18 @@ def collect(client: ActivityClient, now: datetime | None = None) -> dict:
     }
 
 
+def collect_with_retries(client: ActivityClient) -> dict:
+    """Retry short-lived upstream errors without publishing a partial snapshot."""
+    for attempt in range(3):
+        try:
+            return collect(client)
+        except CollectionError:
+            if attempt == 2:
+                raise
+            time.sleep(5 * (attempt + 1))
+    raise AssertionError("unreachable")
+
+
 def write_snapshot(data: dict, output: Path) -> None:
     serialized = json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -221,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, default=Path("assets/activity-data.json"))
     args = parser.parse_args(argv)
     try:
-        data = collect(ActivityClient())
+        data = collect_with_retries(ActivityClient())
         write_snapshot(data, args.output)
     except CollectionError as error:
         print(f"Activity collection failed: {error}", file=sys.stderr)

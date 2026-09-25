@@ -161,6 +161,21 @@ class StreakTests(unittest.TestCase):
 
 
 class CollectionTests(unittest.TestCase):
+    def test_transient_streak_error_is_retried_before_snapshot_is_written(self):
+        calls = []
+
+        def get(source):
+            calls.append(source)
+            if source == "streak" and calls.count("streak") == 1:
+                raise collector.CollectionError("Streak source did not return daily contribution stats.")
+            return FakeClient().get(source)
+
+        with patch.object(collector.time, "sleep") as sleep, patch.object(collector.ActivityClient, "get", side_effect=get):
+            result = collector.collect_with_retries(collector.ActivityClient())
+        self.assertEqual(result["streak"]["total_contributions"], 1148)
+        self.assertEqual(calls, ["stats", "streak", "stats", "streak"])
+        sleep.assert_called_once_with(5)
+
     def response(self, source, body):
         response = Mock()
         response.status = 200
@@ -238,8 +253,9 @@ class CollectionTests(unittest.TestCase):
                 output = Path(directory) / "activity-data.json"
                 output.write_bytes(b"last good snapshot\n")
                 errors = io.StringIO()
-                with patch.object(collector.ActivityClient, "get", side_effect=get), redirect_stderr(errors):
+                with patch.object(collector.ActivityClient, "get", side_effect=get), patch.object(collector.time, "sleep") as sleep, redirect_stderr(errors):
                     self.assertEqual(collector.main(["--output", str(output)]), 1)
+                self.assertEqual(sleep.call_count, 2)
                 self.assertEqual(output.read_bytes(), b"last good snapshot\n")
                 self.assertNotIn("PRIVATE_BODY", errors.getvalue())
                 self.assertEqual(list(Path(directory).iterdir()), [output])
