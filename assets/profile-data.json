@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "login": "luca-1802",
-  "sampled_at": "2026-10-16T12:26:08Z",
+  "sampled_at": "2026-10-17T11:37:44Z",
   "profile": {
     "name": "Luca",
     "followers": 6,
@@ -38,7 +38,7 @@
       "language": "Python",
       "description": "",
       "is_fork": false,
-      "pushed_at": "2026-10-15T12:40:17Z"
+      "pushed_at": "2026-10-16T12:26:31Z"
     },
     {
       "name": "weather-cli",
@@ -100,6 +100,13 @@
   ],
   "commits": [
     {
+      "sha": "06d438ba59c20ccb7e79b40f79fbecd795b1b8d1",
+      "created_at": "2026-10-16T12:26:29Z",
+      "repo": "luca-1802",
+      "message": "commit 06d438b",
+      "url": "https://github.com/luca-1802/luca-1802/commit/06d438ba59c20ccb7e79b40f79fbecd795b1b8d1"
+    },
+    {
       "sha": "2be7e565c94ac0a0add5ddc3174bf9f67cf9570b",
       "created_at": "2026-10-15T12:40:16Z",
       "repo": "luca-1802",
@@ -112,13 +119,6 @@
       "repo": "luca-1802",
       "message": "commit 5a7eed7",
       "url": "https://github.com/luca-1802/luca-1802/commit/5a7eed7ba61f30bd7f8816f8dea0662c5ea3d40f"
-    },
-    {
-      "sha": "dfcd00470b303e9f963056835ca0ef8f36da1640",
-      "created_at": "2026-10-13T15:04:23Z",
-      "repo": "luca-1802",
-      "message": "commit dfcd004",
-      "url": "https://github.com/luca-1802/luca-1802/commit/dfcd00470b303e9f963056835ca0ef8f36da1640"
     },
     {
       "sha": "b18ccc64c4d103f875522adc120e4f3af5e4dd15",
@@ -158,10 +158,6 @@
   ],
   "events": [],
   "activity": [
-    {
-      "date": "2026-09-17",
-      "count": 0
-    },
     {
       "date": "2026-09-18",
       "count": 0
@@ -276,6 +272,10 @@
     },
     {
       "date": "2026-10-16",
+      "count": 0
+    },
+    {
+      "date": "2026-10-17",
       "count": 0
     }
   ]
